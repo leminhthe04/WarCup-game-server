@@ -1,0 +1,68 @@
+name: Deploy Game Server to AWS EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # 1. Cài đặt Java và Build ra file .jar bằng Maven
+    - name: Thiết lập Java 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'corretto'
+        cache: maven
+
+    - name: Build project với Maven
+      run: mvn clean package -DskipTests
+
+    # 2. Đăng nhập vào Docker Hub
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    # 3. Build Docker image và Push lên Docker Hub
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/game-server:latest .
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/game-server:latest
+
+    # 4. Copy file docker-compose.yml lên EC2 (đã bỏ .env vì file này đã lưu cố định trên EC2)
+    - name: Copy files to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        passphrase: ${{ secrets.EC2_SSH_PASSPHRASE }}
+        source: "docker-compose.yml"
+        target: "/home/${{ secrets.EC2_USERNAME }}/game-server"
+
+    # 5. SSH vào EC2, kéo Image mới về và chạy lại
+    - name: Deploy on EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        passphrase: ${{ secrets.EC2_SSH_PASSPHRASE }}
+        script: |
+          cd /home/${{ secrets.EC2_USERNAME }}/game-server
+          
+          # Kéo image app mới nhất
+          docker-compose pull app
+          
+          # Chạy lại server (Docker sẽ tự động đọc file .env nằm sẵn cùng thư mục)
+          docker-compose up -d
+          
+          # Xóa các image rác
+          docker image prune -f

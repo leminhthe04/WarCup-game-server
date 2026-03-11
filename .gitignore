@@ -1,0 +1,53 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+test.py
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+
+### Others ###
+**/src/main/resources/env.properties
+**/src/main/resources/*.env.properties
+
+**/src/main/resources/META-INF/
+**/src/main/resources/static/
+
+**/docs/pos.md
+logs/
+.env
+game_output.log 
+nohup.out
+
+startserver.bat
+SocketClient1.py
+SocketClient2.py
