@@ -21,7 +21,6 @@ WarCup Game Server is a robust backend solution for multiplayer gaming applicati
 
 ### Key Dependencies
 - **Spring Data MongoDB**: Document-oriented database integration
-- **Spring WebSocket**: Real-time bidirectional communication
 - **Spring Security OAuth2**: Authentication and authorization
 - **Redis**: Distributed caching and session management
 - **Netty 4.1.109**: High-performance network application framework
@@ -90,7 +89,7 @@ SPRING_REDIS_PORT=6379
 ./mvnw spring-boot:run
 ```
 
-The server will start on port 8080 (HTTP) and port 8386 (WebSocket).
+The server will start on port 8080 (HTTP) and port 8386 (Socket).
 
 ## 🐳 Docker Deployment
 
@@ -102,7 +101,7 @@ docker-compose up -d
 ```
 
 This starts:
-- Game Server on port 8080 (HTTP) and 8386 (WebSocket)
+- Game Server on port 8080 (HTTP) and 8386 (Socket)
 - MongoDB on port 27017
 - Redis on port 6379
 
@@ -139,9 +138,9 @@ docker run -p 8080:8080 -p 8386:8386 \
 - `SPRING_REDIS_PORT`: Redis server port (default: 6379)
 - `SERVER_PORT`: HTTP server port (default: 8080)
 
-### WebSocket Configuration
+### Socket Configuration
 - **HTTP Port**: 8080 (REST API and Spring Boot)
-- **WebSocket Port**: 8386 (Real-time communication)
+- **Socket Port**: 8386 (Real-time communication)
 
 ## 📝 Build & Test
 
@@ -175,24 +174,3 @@ docker run -p 8080:8080 -p 8386:8386 \
 ## 📊 Monitoring & Logging
 
 The application uses Spring Boot's built-in logging configuration. Logs are output to console and can be directed to files based on your configuration.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please ensure:
-- Code follows Spring Boot best practices
-- Tests are added for new features
-- Documentation is updated accordingly
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
-## 📞 Support
-
-For issues, questions, or suggestions, please open an issue on GitHub.
-
----
-
-**Author**: Le Minh The  
-**Repository**: [leminhthe04/WarCup-game-server](https://github.com/leminhthe04/WarCup-game-server)  
-**Last Updated**: 2026-03-11 15:56:01
