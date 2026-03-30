@@ -129,14 +129,16 @@ public class Troop extends DependentEntity implements SkillReceivable {
     }
 
     /**
-     * Checks if a target is within the troop's defense range (use detection range for consistency)
+     * Checks if a target is within the troop's detection range (use detection range for consistency)
      */
     public boolean isWithinDefenseRange(Entity target) {
         if (target == null || defensePosition == null) {
             return false;
         }
         // Use detection range instead of defense range for consistency
-        return defensePosition.distance(target.getCurrentPosition()) <= this.getDetectionRange();
+        // return defensePosition.distance(target.getCurrentPosition()) <= this.getDetectionRange();
+        return this.getCurrentPosition().distance(target.getCurrentPosition()) <= this.getDetectionRange();
+    
     }
 
     /**

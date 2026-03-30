@@ -10,7 +10,7 @@
     "move_speed": 8.7,
     "attack_speed": 0.9,
     "attack_range": 5.2,
-    "detection_range": 11.0,
+    "detection_range": 22.0,
     "healing_power": 80,
     "healing_range": 3.0,
     "cost": 55
