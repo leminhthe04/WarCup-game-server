@@ -6,13 +6,13 @@
     "hp": 1200,
     "defense": 60,
     "attack": 180,
-    "move_speed": 10.0,
+    "move_speed": 9.5,
     "attack_speed": 1.2,
     "attack_range": 8.5,
     "gold_mine_damage": 2
   },
   "ability": {
     "name": "Piercing Arrow",
-    "cool_down": 0.0
+    "cool_down": 1.0
   }
 }
