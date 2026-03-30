@@ -6,7 +6,7 @@
     "hp": 1300,
     "defense": 55,
     "attack": 150,
-    "move_speed": 4.0,
+    "move_speed": 9.0,
     "attack_speed": 1.0,
     "attack_range": 8.0,
     "gold_mine_damage": 2
