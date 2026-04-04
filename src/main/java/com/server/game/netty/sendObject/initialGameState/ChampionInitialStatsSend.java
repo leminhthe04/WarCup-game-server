@@ -56,7 +56,7 @@ public class ChampionInitialStatsSend implements TLVEncodable {
             })
             .collect(Collectors.toSet());
 
-        System.out.println(this.initGold);
+        System.out.println(this);
     }
 
 

@@ -33,14 +33,18 @@ public class GameInititalLoadingMessageHandler {
     // This method is called by LobbyHandler when all players are ready
     public void loadInitial(Channel channel) {
         GameState gameState = gameStateBuilder.createGameState(channel);
+
+        // broadcast initial positions
         ChannelFuture future = 
             this.sendInitialPositions(channel, gameState);
+
+        // unicast champion initial stats to each player after sending initial positions
         future = this.sendChampionInitialStats(channel, gameState);
         
         future.addListener(f -> {
             if (f.isSuccess()) {
                 log.info(">>> Initial loading messages sent successfully.");
-                // Send initial game state successfully, register game to gameCoordinator
+                // then register game to gameCoordinator
                 gameCoordinator.registerGame(gameState);
             } else {
                 log.error(">>> Initial loading messages failed: " + f.cause());
@@ -50,7 +54,6 @@ public class GameInititalLoadingMessageHandler {
 
 
     private ChannelFuture sendInitialPositions(Channel channel, GameState gameState) {
-
 
         InitialPositionsSend championPositionsSend = 
             new InitialPositionsSend(gameState);
