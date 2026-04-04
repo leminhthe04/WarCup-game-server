@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 import io.netty.channel.Channel;
 
-import com.server.game.model.game.Champion;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.SlotState;
-import com.server.game.model.game.building.Tower;
+import com.server.game.model.entity.Champion;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.SlotState;
+import com.server.game.model.entity.building.Tower;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.pipelineComponent.outboundSendMessage.SendTarget;

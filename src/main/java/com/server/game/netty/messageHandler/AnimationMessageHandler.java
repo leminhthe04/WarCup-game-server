@@ -3,8 +3,8 @@ package com.server.game.netty.messageHandler;
 
 import org.springframework.stereotype.Component;
 
-import com.server.game.model.game.context.AttackContext;
-import com.server.game.model.game.context.CastSkillContext;
+import com.server.game.model.entity.context.AttackContext;
+import com.server.game.model.entity.context.CastSkillContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.CastSkillSend;
 import com.server.game.netty.sendObject.attack.AttackAnimationSend;

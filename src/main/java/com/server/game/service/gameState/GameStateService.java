@@ -14,14 +14,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.server.game.model.game.Champion;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.SlotState;
-import com.server.game.model.game.building.Tower;
-import com.server.game.model.game.context.AttackContext;
-import com.server.game.model.game.context.CastSkillContext;
-import com.server.game.model.game.entityIface.HasFixedPosition;
-import com.server.game.model.game.entityIface.SkillReceivable;
+import com.server.game.model.entity.Champion;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.SlotState;
+import com.server.game.model.entity.building.Tower;
+import com.server.game.model.entity.context.AttackContext;
+import com.server.game.model.entity.context.CastSkillContext;
+import com.server.game.model.entity.entityIface.HasFixedPosition;
+import com.server.game.model.entity.entityIface.SkillReceivable;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.model.map.shape.Shape;
@@ -37,7 +38,6 @@ import com.server.game.netty.sendObject.respawn.ChampionRespawnSend;
 import com.server.game.netty.sendObject.respawn.ChampionRespawnTimeSend;
 import com.server.game.service.move.MoveService;
 import com.server.game.util.Util;
-import com.server.game.model.game.Entity;
 
 import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;

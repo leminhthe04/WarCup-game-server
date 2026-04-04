@@ -1,8 +1,8 @@
 package com.server.game.factory;
 
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.SlotState;
-import com.server.game.model.game.building.Burg;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.SlotState;
+import com.server.game.model.entity.building.Burg;
 import com.server.game.resource.model.SlotInfo.BurgDB;
 
 import lombok.AccessLevel;

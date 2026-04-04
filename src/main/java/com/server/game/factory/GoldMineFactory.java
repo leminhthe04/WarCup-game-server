@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.gameState.SlotStateService;
 import com.server.game.service.move.MoveService;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.GoldMine;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.GoldMine;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.resource.service.TroopService;
 

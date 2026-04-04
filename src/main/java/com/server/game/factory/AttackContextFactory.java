@@ -1,8 +1,8 @@
 package com.server.game.factory;
 
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.context.AttackContext;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.context.AttackContext;
 import com.server.game.service.gameState.GameStateService;
 
 import lombok.AllArgsConstructor;

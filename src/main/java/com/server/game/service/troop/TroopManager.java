@@ -1,11 +1,11 @@
 package com.server.game.service.troop;
 
 import com.server.game.factory.TroopFactory;
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.Troop;
-import com.server.game.model.game.context.AttackContext;
-import com.server.game.model.game.context.MoveContext;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.context.AttackContext;
+import com.server.game.model.entity.context.MoveContext;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.entity.EntityDeathSend;
@@ -35,17 +35,16 @@ public class TroopManager {
     private final MoveContextFactory moveContextFactory;
     private final MoveService moveService;
 
-    
     private final AttackService attackService;
     private final AttackContextFactory attackContextFactory;
 
-    /** 
+    /**
      * Add a troop instance to the game state.
      */
     public Troop createTroop(String gameId, short ownerSlot, TroopEnum troopType, Vector2 position) {
         return troopFactory.createTroop(gameId, ownerSlot, troopType, position);
     }
-    
+
     /**
      * Remove a troop instance (when it dies or is manually removed)
      */
@@ -57,32 +56,36 @@ public class TroopManager {
         }
 
         Troop troop = (Troop) troopInstance;
-        
+
         // Remove from SlotState first
         slotStateService.removeTroop(troop.getOwnerSlot(), troop);
-        
+
         // Remove from GameState
         gameStateService.removeEntity(gameState, troopInstance);
-        
+
         return true;
     }
 
-    /** 
+    /**
      * Attack a target
      */
     public void setAttackTarget(String gameId, String troopInstanceId, String targetId) {
         GameState gameState = gameStateService.getGameStateById(gameId);
         Entity troop = gameStateService.getEntityByStringId(gameState, troopInstanceId);
 
-        if (troop instanceof Troop) {
-            ((Troop) troop).setInDefensiveStance(false); // Disable defense on manual attack
+        if (troop == null || !(troop instanceof Troop)) {
+            log.warn("Troop instance not found for ID: {}", troopInstanceId);
+            return;
         }
 
-        AttackContext attackContext = attackContextFactory.createAttackContext(gameId, troopInstanceId, targetId, System.currentTimeMillis());
+        ((Troop) troop).setInDefensiveStance(false); // Disable defense on manual attack
+
+        AttackContext attackContext = attackContextFactory.createAttackContext(gameId, troopInstanceId, targetId,
+                System.currentTimeMillis());
         attackService.setAttack(attackContext);
     }
 
-    /** 
+    /**
      * Set move position for a troop instance
      */
     public void setMovePosition(String gameId, String troopInstanceId, Vector2 position) {
@@ -96,21 +99,23 @@ public class TroopManager {
             log.warn("Troop instance not found for ID: {}", troopInstanceId);
             return;
         }
-        
+
         Troop troop = (Troop) troopInstance;
-        
+
         // Update defense position but do NOT enable defensive stance for manual moves
         troop.updateDefensePosition(position);
         troop.setInDefensiveStance(false); // Disable defensive stance on manual move
-        
-        MoveContext moveContext = moveContextFactory.createMoveContext(gameState, troopInstance, position, System.currentTimeMillis());
+
+        MoveContext moveContext = moveContextFactory.createMoveContext(gameState, troopInstance, position,
+                System.currentTimeMillis());
         moveService.setMove(moveContext, true);
-        
+
         log.debug("Manual move set for troop {} to position {}. Defensive stance disabled.", troopInstanceId, position);
     }
 
     /**
      * Check if a troop has died and handle death logic
+     * 
      * @return true if troop died, false otherwise
      */
     public boolean checkAndHandleTroopDeath(GameState gameState, String troopInstanceId) {
@@ -143,17 +148,18 @@ public class TroopManager {
     public void checkAndHandleAllTroopDeaths(GameState gameState) {
         // Collect all dead troops to avoid concurrent modification
         var deadTroops = gameState.getEntities().stream()
-            .filter(entity -> entity.getStringId().startsWith("troop_"))
-            .filter(entity -> entity.getCurrentHP() <= 0)
-            .map(Entity::getStringId)
-            .toList();
+                .filter(entity -> entity.getStringId().startsWith("troop_"))
+                .filter(entity -> entity.getCurrentHP() <= 0)
+                .map(Entity::getStringId)
+                .toList();
 
         // Process each dead troop
         for (String troopId : deadTroops) {
             try {
                 this.checkAndHandleTroopDeath(gameState, troopId);
             } catch (Exception e) {
-                log.error("Error processing death for troop {} in game {}: {}", troopId, gameState.getGameId(), e.getMessage(), e);
+                log.error("Error processing death for troop {} in game {}: {}", troopId, gameState.getGameId(),
+                        e.getMessage(), e);
             }
         }
 

@@ -1,9 +1,9 @@
 package com.server.game.service.defense;
 
 import com.server.game.factory.AttackContextFactory;
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.Troop;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.Troop;
 import com.server.game.service.attack.AttackService;
 import com.server.game.service.move.MoveService;
 import lombok.RequiredArgsConstructor;

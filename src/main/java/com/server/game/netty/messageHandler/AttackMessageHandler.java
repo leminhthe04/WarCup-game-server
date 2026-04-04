@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 
 import com.server.game.annotation.customAnnotation.MessageMapping;
 import com.server.game.factory.AttackContextFactory;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.Troop;
-import com.server.game.model.game.context.AttackContext;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.receiveObject.attack.AttackReceive;
 import com.server.game.service.attack.AttackService;

@@ -2,9 +2,9 @@ package com.server.game.service.move;
 
 import org.springframework.stereotype.Service;
 
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.context.MoveContext;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.context.MoveContext;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.service.attack.AttackService;
 

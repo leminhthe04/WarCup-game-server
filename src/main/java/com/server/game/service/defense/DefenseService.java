@@ -6,12 +6,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.server.game.factory.AttackContextFactory;
-import com.server.game.model.game.Champion;
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.Troop;
-import com.server.game.model.game.building.Burg;
-import com.server.game.model.game.building.Tower;
+import com.server.game.model.entity.Champion;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.building.Burg;
+import com.server.game.model.entity.building.Tower;
 import com.server.game.service.attack.AttackService;
 
 import lombok.RequiredArgsConstructor;

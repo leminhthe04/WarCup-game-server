@@ -2,8 +2,9 @@ package com.server.game.service.gameState;
 
 import org.springframework.stereotype.Service;
 
-import com.server.game.model.game.SlotState;
-import com.server.game.model.game.Troop;
+import com.server.game.model.entity.SlotState;
+import com.server.game.model.entity.Troop;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

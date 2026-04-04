@@ -4,8 +4,8 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import com.server.game.factory.GameStateFactory;
-import com.server.game.model.game.Champion;
-import com.server.game.model.game.GameState;
+import com.server.game.model.entity.Champion;
+import com.server.game.model.entity.GameState;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.initialGameState.ChampionInitialStatsSend;
 import com.server.game.netty.sendObject.initialGameState.InitialPositionsSend;

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import io.netty.channel.Channel;
 
-import com.server.game.model.game.Champion;
+import com.server.game.model.entity.Champion;
 import com.server.game.netty.pipelineComponent.outboundSendMessage.SendTarget;
 import com.server.game.netty.pipelineComponent.outboundSendMessage.sendTargetType.UnicastTarget;
 import com.server.game.netty.tlv.interf4ce.TLVEncodable;
@@ -55,6 +55,8 @@ public class ChampionInitialStatsSend implements TLVEncodable {
                 troopDB.getStats().getCost());
             })
             .collect(Collectors.toSet());
+
+        System.out.println(this.initGold);
     }
 
 

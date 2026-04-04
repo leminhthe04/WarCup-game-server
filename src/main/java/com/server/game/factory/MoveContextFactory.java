@@ -1,8 +1,8 @@
 package com.server.game.factory;
 
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.context.MoveContext;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.context.MoveContext;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.service.gameState.GameStateService;
 

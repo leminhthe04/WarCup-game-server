@@ -3,7 +3,7 @@ package com.server.game.util;
 
 import java.util.*;
 
-import com.server.game.model.game.GameState;
+import com.server.game.model.entity.GameState;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.resource.model.GameMapGrid;

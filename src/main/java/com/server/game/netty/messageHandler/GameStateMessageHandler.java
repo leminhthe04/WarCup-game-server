@@ -3,9 +3,9 @@ package com.server.game.netty.messageHandler;
 
 import org.springframework.stereotype.Component;
 
-import com.server.game.model.game.Entity;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
 import com.server.game.netty.ChannelManager;
-import com.server.game.model.game.GameState;
 import com.server.game.netty.sendObject.PositionSend;
 import com.server.game.netty.sendObject.attack.HealthUpdateSend;
 import com.server.game.netty.sendObject.entity.EntityDeathSend;

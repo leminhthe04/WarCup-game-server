@@ -1,10 +1,10 @@
 package com.server.game.factory;
 
-import com.server.game.model.game.Champion;
-import com.server.game.model.game.Entity;
-import com.server.game.model.game.GameState;
-import com.server.game.model.game.context.CastSkillContext;
-import com.server.game.model.game.entityIface.SkillReceivable;
+import com.server.game.model.entity.Champion;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.context.CastSkillContext;
+import com.server.game.model.entity.entityIface.SkillReceivable;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.service.gameState.GameStateService;
 import lombok.AllArgsConstructor;

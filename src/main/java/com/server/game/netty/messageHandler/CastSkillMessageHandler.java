@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.server.game.annotation.customAnnotation.MessageMapping;
 import com.server.game.factory.CastSkillContextFactory;
-import com.server.game.model.game.context.CastSkillContext;
+import com.server.game.model.entity.context.CastSkillContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.receiveObject.CastSkillReceive;
 import com.server.game.service.castSkill.CastSkillService;
