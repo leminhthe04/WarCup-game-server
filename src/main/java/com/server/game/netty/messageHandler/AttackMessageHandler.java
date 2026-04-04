@@ -3,11 +3,12 @@ package com.server.game.netty.messageHandler;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+
 import org.springframework.stereotype.Component;
 
 import com.server.game.annotation.customAnnotation.MessageMapping;
 import com.server.game.factory.AttackContextFactory;
-import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
@@ -38,8 +39,9 @@ public class AttackMessageHandler {
     public void handleAttackMessage(AttackReceive receiveObject, Channel channel) {
         String gameId = ChannelManager.getGameIdByChannel(channel);
         String entityStringId = receiveObject.getAttackerId();
+        String targetStringId = receiveObject.getTargetId();
 
-        long clientTimestamp = receiveObject.getTimestamp();
+        // long clientTimestamp = receiveObject.getTimestamp();
         
         // Rate limiting check
         String playerKey = gameId + ":" + entityStringId;
@@ -54,23 +56,24 @@ public class AttackMessageHandler {
         // Update the last update time
         lastUpdateTime.put(playerKey, currentTime);
 
-        if (entityStringId.equals(receiveObject.getTargetId())) {
+        Entity attacker = gameStateService.getEntityByStringId(gameId, entityStringId);
+        Entity target = gameStateService.getEntityByStringId(gameId, targetStringId);
+
+        // Prevent attacking self
+        if (attacker.equals(target)) {
             return;
         }
 
-        if (entityStringId.startsWith("minion_") ) {
-            GameState gameState = gameStateService.getGameStateById(gameId);
-            Minion minion = (Minion) gameState.getEntityByStringId(entityStringId);
+        if (attacker instanceof Minion minion) {
             minion.setInDefensiveStance(false);
             minion.setDefensePosition(null);
             log.info("Minion {} defensive stance disabled", entityStringId);
         }
 
-        AttackContext attackContext = attackContextFactory.createAttackContext(
-            gameId, entityStringId, receiveObject.getTargetId(), clientTimestamp);
-
+        AttackContext attackContext = attackContextFactory.createAttackContext(attacker, target);
 
         attackService.setAttack(attackContext);
+
         log.info("Attack context set for entity: {}", entityStringId);
     }
 } 

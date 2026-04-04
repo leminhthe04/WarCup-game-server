@@ -74,7 +74,7 @@ public abstract class Entity implements Attackable {
 
     public boolean isAllies(Entity other) {
         if (this.getOwnerSlot() != null && other.getOwnerSlot() != null) {
-            return this.getOwnerSlot().getSlot() == other.getOwnerSlot().getSlot();
+            return this.getOwnerSlot().getSlotNumber() == other.getOwnerSlot().getSlotNumber();
         }
         log.info("One of the entities does not have an owner slot, returning false for isAllies.");
         return false; // Default value if no owner slot is present
@@ -402,6 +402,13 @@ public abstract class Entity implements Attackable {
         return true; // Default value if no skill component is present
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || this.getClass() != obj.getClass()) return false;
+        Entity other = (Entity) obj;
+        return stringId.equals(other.stringId);
+    }
 
 
 }

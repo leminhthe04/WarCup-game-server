@@ -27,7 +27,7 @@ public final class Tower extends Building {
     final AttackComponent attackComponent;
 
     public Tower(SlotState ownerSlot, GameState gameState, TowerDB towerDB) {
-        super("tower_" + ownerSlot.getSlot() + UUID.randomUUID().toString(),
+        super("tower_" + ownerSlot.getSlotNumber() + UUID.randomUUID().toString(),
         ownerSlot, gameState, 
         gameState.getGameMap().getTowerHP(), 
         gameState.getGameMap().getTowerDefense(), 

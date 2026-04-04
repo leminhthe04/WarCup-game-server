@@ -12,7 +12,6 @@ import com.server.game.util.MinionEnum;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.Minion;
-import com.server.game.model.map.component.Vector2;
 import com.server.game.resource.modelInfo.MinionInfo;
 import com.server.game.service.minion.MinionService;
 

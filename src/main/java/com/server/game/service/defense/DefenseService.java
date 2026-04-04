@@ -68,9 +68,7 @@ public class DefenseService {
         findPriorityTargetInRange(tower, gameState).ifPresent(enemy -> {
             log.trace("Tower {} found new target: {}", tower.getStringId(), enemy.getStringId());
 
-            attackService.setAttack(attackContextFactory.createAttackContext(
-                gameState.getGameId(), tower.getStringId(), enemy.getStringId(), gameState.getCurrentTick()
-            ));
+            attackService.setAttack(attackContextFactory.createAttackContext(tower, enemy));
         });
     }
 
@@ -98,9 +96,7 @@ public class DefenseService {
         findPriorityTargetInRange(burg, gameState).ifPresent(enemy -> {
             log.trace("Burg {} found new target: {}", burg.getStringId(), enemy.getStringId());
 
-            attackService.setAttack(attackContextFactory.createAttackContext(
-                gameState.getGameId(), burg.getStringId(), enemy.getStringId(), gameState.getCurrentTick()
-            ));
+            attackService.setAttack(attackContextFactory.createAttackContext(burg, enemy));
         });
     }
 
@@ -121,7 +117,7 @@ public class DefenseService {
         Optional<Entity> troopTarget = gameState.getEntities().stream()
             .filter(Entity::isAlive)
             .filter(e -> e.getOwnerSlot() != null)
-            .filter(e -> e.getOwnerSlot().getSlot() != defender.getOwnerSlot().getSlot()) // Is an enemy
+            .filter(e -> e.getOwnerSlot().getSlotNumber() != defender.getOwnerSlot().getSlotNumber()) // Is an enemy
             .filter(e -> e instanceof Minion)
             .filter(e -> defender.distanceTo(e) <= attackRange)
             .min(Comparator.comparing(e -> defender.distanceTo(e)));
@@ -134,7 +130,7 @@ public class DefenseService {
         return gameState.getEntities().stream()
             .filter(Entity::isAlive)
             .filter(e -> e.getOwnerSlot() != null)
-            .filter(e -> e.getOwnerSlot().getSlot() != defender.getOwnerSlot().getSlot()) // Is an enemy
+            .filter(e -> e.getOwnerSlot().getSlotNumber() != defender.getOwnerSlot().getSlotNumber()) // Is an enemy
             .filter(e -> e instanceof Champion)
             .filter(e -> defender.distanceTo(e) <= attackRange)
             .min(Comparator.comparing(e -> defender.distanceTo(e)));

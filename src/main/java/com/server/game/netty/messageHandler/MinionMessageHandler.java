@@ -1,6 +1,5 @@
 package com.server.game.netty.messageHandler;
 
-import com.server.game.service.attack.AttackService;
 import org.springframework.stereotype.Component;
 
 import com.server.game.annotation.customAnnotation.MessageMapping;
@@ -13,8 +12,6 @@ import com.server.game.netty.ChannelManager;
 import com.server.game.netty.receiveObject.minion.MinionMovingReceive;
 import com.server.game.netty.receiveObject.minion.MinionSpawnReceive;
 import com.server.game.netty.sendObject.minion.MinionSpawnSend;
-import com.server.game.resource.modelInfo.GameMapInfo;
-import com.server.game.resource.modelInfo.SlotInfo;
 import com.server.game.netty.sendObject.minion.MinionCooldownSend;
 import com.server.game.service.gameState.GameCoordinator;
 import com.server.game.service.gameState.GameStateService;
@@ -40,7 +37,6 @@ import java.util.Map;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MinionMessageHandler {
 
-    AttackService attackService;
     MinionService minionService;
     GameCoordinator gameCoordinator;
     GameStateService gameStateService;
@@ -92,13 +88,6 @@ public class MinionMessageHandler {
 
         SlotState requestingSlot = gameStateService.getSlotStateFromSlotNumber(gameState, requestingSlotNumber);
 
-        // Vector2 spawnPosition = minionService.getMinionSpawnPosition(gameState,
-        // requestingSlot);
-        // if (spawnPosition == null) {
-        // log.warn("Could not determine spawn position for minion type: {}", minionType);
-        // return;
-        // }
-
         Minion newMinion = minionService.createMinion(requestingSlot, minionType);
 
         if (newMinion == null) {
@@ -115,29 +104,6 @@ public class MinionMessageHandler {
         channel.writeAndFlush(cooldownMessage);
 
         minionService.afterMinionSpawning(newMinion);
-
-        // minionService.setAttackTarget(gameId, gameId, cooldownKey);
-
-        // boolean isAttack = request.isAttack();
-        // if (isAttack) {
-        // log.info("Spawning attack minion of type {} for owner slot {}", minionType,
-        // request.getOwnerSlot());
-        // SlotState slotState = gameState.getSlotState(request.getOwnerSlot());
-        // if (slotState != null && slotState.getChampion() != null) {
-        // minionService.setAttackTarget(gameId, minionInstance.getStringId(),
-        // slotState.getChampion().getStringId());
-        // }
-        // } else {
-        // var minionPosition = getMinionPositionForSlot(gameState,
-        // request.getOwnerSlot());
-        // if (minionPosition != null) {
-        // log.info("Spawning minion minion of type {} for owner slot {}", minionType,
-        // request.getOwnerSlot());
-        // log.info("Minion position: {}", minionPosition);
-        // minionService.setMovePosition(gameId, minionInstance.getStringId(),
-        // minionPosition);
-        // }
-        // }
 
         this.broadcastMinionSpawn(newMinion);
 
@@ -189,14 +155,15 @@ public class MinionMessageHandler {
             }
 
             Minion minion = (Minion) minionEntity;
-            if (minion.getOwnerSlot().getSlot() != requestingSlot) {
+            if (minion.getOwnerSlot().getSlotNumber() != requestingSlot) {
                 log.warn("Player {} attempted to move minion {} owned by slot {}",
-                        requestingSlot, minionId, minion.getOwnerSlot().getSlot());
+                        requestingSlot, minionId, minion.getOwnerSlot().getSlotNumber());
                 continue;
             }
 
+            // TODO
             // Set the new position for the minion
-            minionService.setMovePosition(gameId, minionId, moveToPosition);
+            // minionService.setMovePosition(gameId, minionId, moveToPosition);
 
             log.debug("Moved minion {} to spread position {}", minionId, moveToPosition);
         }

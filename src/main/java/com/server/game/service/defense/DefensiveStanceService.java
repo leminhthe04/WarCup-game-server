@@ -69,9 +69,7 @@ public class DefensiveStanceService {
             } else {
                 // Target is valid, continue attacking (don't exit early for attacking state)
                 if (!minion.isAttacking()) {
-                    attackService.setAttack(attackContextFactory.createAttackContext(
-                        gameState.getGameId(), minion.getStringId(), target.getStringId(), gameState.getCurrentTick()
-                    ));
+                    attackService.setAttack(attackContextFactory.createAttackContext(minion, target));
                 }
             }
             return;
@@ -82,9 +80,7 @@ public class DefensiveStanceService {
             log.trace("Minion {} detected new enemy {} in detection range.", minion.getStringId(), enemy.getStringId());
             minion.setDefensiveTarget(enemy);
             // Immediately start attacking the new target
-            attackService.setAttack(attackContextFactory.createAttackContext(
-                gameState.getGameId(), minion.getStringId(), enemy.getStringId(), gameState.getCurrentTick()
-            ));
+            attackService.setAttack(attackContextFactory.createAttackContext(minion, enemy));
         });
 
         // --- Return to post if idle and away ---
@@ -100,7 +96,7 @@ public class DefensiveStanceService {
         return gameState.getEntities().stream()
             .filter(Entity::isAlive)
             .filter(e -> e.getOwnerSlot() != null) // Ensure entity has an owner slot
-            .filter(e -> e.getOwnerSlot().getSlot() != minion.getOwnerSlot().getSlot()) // Is an enemy
+            .filter(e -> e.getOwnerSlot().getSlotNumber() != minion.getOwnerSlot().getSlotNumber()) // Is an enemy
             .filter(e -> minion.getCurrentPosition().distance(e.getCurrentPosition()) <= minion.getDetectionRange())
             .min(Comparator.comparing(e -> minion.getCurrentPosition().distance(e.getCurrentPosition())));
     }

@@ -4,6 +4,7 @@ import com.server.game.factory.MinionFactory;
 import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
+import com.server.game.model.entity.building.Burg;
 import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.model.entity.context.MoveContext;
@@ -97,56 +98,80 @@ public class MinionService {
         return true;
     }
 
+    /**
+     * By default, after spawning, minions will move to and attack the opponent's
+     * burg.
+     */
     public void afterMinionSpawning(Minion newMinion) {
-        // TODO
-    }
+        GameState gameState = newMinion.getGameState();
 
+        List<SlotState> slotStates = gameStateService.getAllSlotStates(gameState);
+        if (slotStates == null || slotStates.size() < 2) {
+            throw new IllegalStateException("Not enough slot states found in game state for minion to attack");
+        }
+
+        List<SlotState> opponentSlots = slotStates.stream()
+                .filter(slotState -> !slotState.equals(newMinion.getOwnerSlot()))
+                .toList();
+
+        // TODO: Handle if there are more than one opponent (in 3+ player games)
+        SlotState targetSlot = opponentSlots.get(0);
+        Burg targetBurg = slotStateService.getBurg(targetSlot);
+
+        this.setAttackTarget(newMinion, targetBurg);
+
+        log.info("Minion spawned and move toward to opponent's burg to attack. MinionId: {}, TargetBurgId: {}",
+                newMinion.getStringId(), targetBurg.getStringId());
+    }
 
     /**
      * Attack a target
      */
-    // public void setAttackTarget(String gameId, String minionInstanceId, String targetId) {
-    //     GameState gameState = gameStateService.getGameStateById(gameId);
-    //     Entity minion = gameStateService.getEntityByStringId(gameState, minionInstanceId);
+    public void setAttackTarget(Minion minion, Entity target) {
+        if (minion == null) {
+            log.warn("Minion instance not found");
+            return;
+        }
 
-    //     if (minion == null || !(minion instanceof Minion)) {
-    //         log.warn("Minion instance not found for ID: {}", minionInstanceId);
-    //         return;
-    //     }
+        minion.setInDefensiveStance(false); // Disable defense on manual attack
 
-    //     ((Minion) minion).setInDefensiveStance(false); // Disable defense on manual attack
+        AttackContext attackContext = attackContextFactory.createAttackContext(minion, target);
 
-    //     AttackContext attackContext = attackContextFactory.createAttackContext(gameId, minionInstanceId, targetId,
-    //             System.currentTimeMillis());
-    //     attackService.setAttack(attackContext);
-    // }
+        attackService.setAttack(attackContext);
+    }
 
     /**
      * Set move position for a minion instance
      */
-    // public void setMovePosition(String gameId, String minionInstanceId, Vector2 position) {
-    //     GameState gameState = gameStateService.getGameStateById(gameId);
-    //     if (gameState == null) {
-    //         log.warn("Game state not found for game ID: {}", gameId);
-    //         return;
-    //     }
-    //     Entity minionInstance = gameStateService.getEntityByStringId(gameState, minionInstanceId);
-    //     if (minionInstance == null) {
-    //         log.warn("Minion instance not found for ID: {}", minionInstanceId);
-    //         return;
-    //     }
+    // public void setMovePosition(String gameId, String minionInstanceId, Vector2
+    // position) {
+    // GameState gameState = gameStateService.getGameStateById(gameId);
+    // if (gameState == null) {
+    // log.warn("Game state not found for game ID: {}", gameId);
+    // return;
+    // }
+    // Entity minionInstance = gameStateService.getEntityByStringId(gameState,
+    // minionInstanceId);
+    // if (minionInstance == null) {
+    // log.warn("Minion instance not found for ID: {}", minionInstanceId);
+    // return;
+    // }
 
-    //     Minion minion = (Minion) minionInstance;
+    // Minion minion = (Minion) minionInstance;
 
-    //     // Update defense position but do NOT enable defensive stance for manual moves
-    //     minion.updateDefensePosition(position);
-    //     minion.setInDefensiveStance(false); // Disable defensive stance on manual move
+    // // Update defense position but do NOT enable defensive stance for manual
+    // moves
+    // minion.updateDefensePosition(position);
+    // minion.setInDefensiveStance(false); // Disable defensive stance on manual
+    // move
 
-    //     MoveContext moveContext = moveContextFactory.createMoveContext(gameState, minionInstance, position,
-    //             System.currentTimeMillis());
-    //     moveService.setMove(moveContext, true);
+    // MoveContext moveContext = moveContextFactory.createMoveContext(gameState,
+    // minionInstance, position,
+    // System.currentTimeMillis());
+    // moveService.setMove(moveContext, true);
 
-    //     log.debug("Manual move set for minion {} to position {}. Defensive stance disabled.", minionInstanceId, position);
+    // log.debug("Manual move set for minion {} to position {}. Defensive stance
+    // disabled.", minionInstanceId, position);
     // }
 
     /**

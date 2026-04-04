@@ -25,12 +25,11 @@ public class AttackContext { // only normal attacks, not skills
     @NotNull
     private Map<Object, Object> extraData = new HashMap<>(); 
 
-    public AttackContext(
-        GameState gameState, Entity attacker, Entity target, long timestamp) {
-        this.gameState = gameState;
+    public AttackContext(Entity attacker, Entity target) {
+        this.gameState = attacker.getGameState();
         this.attacker = attacker;
         this.target = target;
-        this.timestamp = timestamp;
+        this.timestamp = System.currentTimeMillis();
     }
 
     public void addExtraData(Object key, Object value) {

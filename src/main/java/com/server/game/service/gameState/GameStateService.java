@@ -84,6 +84,14 @@ public class GameStateService {
         return slotState;
     }
 
+    public List<SlotState> getAllSlotStates(GameState gameState) {
+        if (gameState == null) {
+            log.warn("Game state is null");
+            return null;
+        }
+        return gameState.getAllSlotStates();
+    }
+
     public float getSpawnRotate(SlotState slotState) {
         if (slotState == null) {
             log.warn("Slot state is null");
@@ -91,7 +99,7 @@ public class GameStateService {
         }
         GameState gameState = slotState.getGameState();
         if (gameState == null) {
-            log.warn("Game state is null for slot: {}", slotState.getSlot());
+            log.warn("Game state is null for slot: {}", slotState.getSlotNumber());
             return 0f; // Default rotation
         }
         return gameState.getSpawnRotate(slotState);
@@ -235,7 +243,7 @@ public class GameStateService {
     public void scheduleChampionRespawn(SlotState slotState, short respawnTime) {
 
         String gameId = slotState.getGameState().getGameId();
-        short slot = slotState.getSlot();
+        short slot = slotState.getSlotNumber();
 
         // Create a unique key for this respawn
         String respawnKey = gameId + ":" + slot;
@@ -576,7 +584,7 @@ public class GameStateService {
         
         // Send the update message to all players in the game
         this.playgroundMessageHandler.sendInPlaygroundUpdateMessage(
-            gameState.getGameId(), slot.getSlot(), isInPlayground);
+            gameState.getGameId(), slot.getSlotNumber(), isInPlayground);
     }
 
     public void sendAttackAnimation(AttackContext ctx) {

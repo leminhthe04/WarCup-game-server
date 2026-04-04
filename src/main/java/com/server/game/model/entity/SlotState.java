@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SlotState {
-    final Short slot;
+    final Short slotNumber;
 
     final GameState gameState;
 
@@ -43,18 +43,14 @@ public class SlotState {
 
     final Set<Minion> minions;
 
-    public SlotState(GameState gameState, Short slot, Champion champion, Set<Tower> towers, Burg bug, Integer initialGold) {
+    public SlotState(GameState gameState, Short slotNumber, Champion champion, Set<Tower> towers, Burg burg, Integer initialGold) {
         this.gameState = gameState;
-        this.slot = slot;
+        this.slotNumber = slotNumber;
         this.champion = champion;
         this.towers = (towers != null) ? towers : new HashSet<>();
-        this.burg = bug;
+        this.burg = burg;
         this.goldComponent = new GoldComponent(initialGold);
         this.minions = new HashSet<>();
-    }
-
-    public Short getSlotNumber() {
-        return this.slot;
     }
 
     public void addMinion(Minion minion) {
@@ -108,7 +104,7 @@ public class SlotState {
         if (other == null) { return false; }
         if (!(other instanceof SlotState otherSlotState)) { return false; }
         if (this == other) { return true; }
-        return this.slot == otherSlotState.slot;
+        return this.slotNumber == otherSlotState.slotNumber;
     }
 
     /**
@@ -116,7 +112,7 @@ public class SlotState {
      */
     public String getStatusSummary() {
         return String.format("Slot %d (%s): HP %d/%d, Gold: %d, Minions: %d, Alive: %s",
-                slot, champion.getChampionEnum(), getCurrentHP(), getMaxHP(), getCurrentGold(), getMinionCount(),
+                slotNumber, champion.getChampionEnum(), getCurrentHP(), getMaxHP(), getCurrentGold(), getMinionCount(),
                 champion.isAlive());
     }
 }

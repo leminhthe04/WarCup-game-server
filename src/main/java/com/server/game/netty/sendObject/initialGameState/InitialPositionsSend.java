@@ -107,7 +107,7 @@ public class InitialPositionsSend implements TLVEncodable {
         BurgData burgData; 
 
         public InitialPositionData(GameState gameState, SlotState slotState) {
-            this.slot = slotState.getSlot();
+            this.slot = slotState.getSlotNumber();
             Champion champion = slotState.getChampion();
             this.championEnum = champion.getChampionEnum();
             this.championStringId = champion.getStringId();
@@ -167,7 +167,7 @@ public class InitialPositionsSend implements TLVEncodable {
                 this.stringId = tower.getStringId();
                 this.position = tower.getPosition();
                 this.rotate = gameState.getGameMap()
-                        .getTowerDB(slotState.getSlot(), tower.getDbId())
+                        .getTowerDB(slotState.getSlotNumber(), tower.getDbId())
                         .getRotate();
             }
 
@@ -198,7 +198,7 @@ public class InitialPositionsSend implements TLVEncodable {
                 this.stringId = slotState.getBurg().getStringId();
                 this.position = slotState.getBurg().getPosition();
                 this.rotate = gameState.getGameMap()
-                        .getBurgDB(slotState.getSlot())
+                        .getBurgDB(slotState.getSlotNumber())
                         .getRotate();
             }
 
