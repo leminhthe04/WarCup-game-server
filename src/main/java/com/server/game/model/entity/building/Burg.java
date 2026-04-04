@@ -11,7 +11,7 @@ import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.attackStrategy.BurgAttackStrategy;
 import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.context.AttackContext;
-import com.server.game.resource.model.SlotInfo.BurgDB;
+import com.server.game.resource.modelInfo.SlotInfo.BurgDB;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

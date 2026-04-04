@@ -15,7 +15,7 @@ import com.server.game.service.defense.DefensiveStanceService;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.gold.GoldService;
 import com.server.game.service.move.MoveService;
-import com.server.game.service.troop.TroopManager;
+import com.server.game.service.minion.MinionService;
 
 import io.netty.channel.Channel;
 import lombok.AccessLevel;
@@ -36,7 +36,7 @@ public class GameLogicScheduler {
     GameStateService gameStateService;
     DefensiveStanceService defensiveStanceService;
     DefenseService defenseService;
-    TroopManager troopManager;
+    MinionService troopManager;
     
     /**
      * Main game logic loop - runs every 33ms (~30 FPS)
@@ -53,8 +53,8 @@ public class GameLogicScheduler {
                 // Process attack targeting and continuous combat
                 attackService.processAttacks(gameState);
 
-                // Check for troop deaths and handle cleanup
-                troopManager.checkAndHandleAllTroopDeaths(gameState);
+                // Check for minion deaths and handle cleanup
+                troopManager.checkAndHandleAllMinionDeaths(gameState);
 
                 // Update movement positions
                 moveService.updatePositions(gameState);

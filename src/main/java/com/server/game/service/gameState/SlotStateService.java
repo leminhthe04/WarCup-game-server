@@ -3,34 +3,34 @@ package com.server.game.service.gameState;
 import org.springframework.stereotype.Service;
 
 import com.server.game.model.entity.SlotState;
-import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.Minion;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class SlotStateService {
-    public void addTroop(SlotState slotState, Troop troop) {
-        if (slotState == null || troop == null) {
-            log.warn("SlotState or TroopInstance is null when adding troop");
+    public void addMinion(SlotState slotState, Minion minion) {
+        if (slotState == null || minion == null) {
+            log.warn("SlotState or TroopInstance is null when adding minion");
             return;
         }
 
-        slotState.addTroop(troop);
-        log.info("Added troop {} to slot state {}", troop.getStringId(), slotState.getSlot());
+        slotState.addMinion(minion);
+        log.info("Added minion {} to slot state {}", minion.getStringId(), slotState.getSlot());
     }
 
-    public boolean removeTroop(SlotState slotState, Troop troop) {
-        if (slotState == null || troop == null) {
-            log.warn("SlotState or TroopInstance is null when removing troop");
+    public boolean removeMinion(SlotState slotState, Minion minion) {
+        if (slotState == null || minion == null) {
+            log.warn("SlotState or TroopInstance is null when removing minion");
             return false;
         }
 
-        boolean removed = slotState.getTroops().remove(troop);
+        boolean removed = slotState.getMinions().remove(minion);
         if (removed) {
-            log.info("Removed troop {} from slot state {}", troop.getStringId(), slotState.getSlot());
+            log.info("Removed minion {} from slot state {}", minion.getStringId(), slotState.getSlot());
         } else {
-            log.warn("Failed to remove troop {} from slot state {} - troop not found", troop.getStringId(), slotState.getSlot());
+            log.warn("Failed to remove minion {} from slot state {} - minion not found", minion.getStringId(), slotState.getSlot());
         }
         return removed;
     }

@@ -6,7 +6,7 @@ import java.util.*;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.GameMapGrid;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +16,7 @@ public class ThetaStarPathfinder {
     // 4 directions or 8 directions ???
     private static final int[][] DIRECTIONS = Util.EIGHT_DIRECTIONS;
 
-    public static List<GridCell> findPath(GameMapGrid gameMapGrid, GridCell start, GridCell end) {
+    public static List<GridCell> findPath(GameMapGridInfo gameMapGrid, GridCell start, GridCell end) {
         boolean[][] grid = gameMapGrid.getGrid();
         int rows = grid.length;
         int cols = grid[0].length;

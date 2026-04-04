@@ -11,7 +11,7 @@ import com.server.game.service.move.MoveService;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.GoldMine;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.service.TroopService;
+import com.server.game.service.minion.MinionService;
 
 import lombok.AccessLevel;
 
@@ -24,7 +24,7 @@ public class GoldMineFactory {
 
     GameStateService gameStateService;
     ChampionFactory championFactory;
-    TroopService troopService;
+    MinionService troopService;
     SlotStateService slotStateService;
     MoveService moveService;
 

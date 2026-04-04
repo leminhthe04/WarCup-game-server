@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.server.game.annotation.customAnnotation.MessageMapping;
 import com.server.game.factory.AttackContextFactory;
 import com.server.game.model.entity.GameState;
-import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.receiveObject.attack.AttackReceive;
@@ -58,12 +58,12 @@ public class AttackMessageHandler {
             return;
         }
 
-        if (entityStringId.startsWith("troop_") ) {
+        if (entityStringId.startsWith("minion_") ) {
             GameState gameState = gameStateService.getGameStateById(gameId);
-            Troop troop = (Troop) gameState.getEntityByStringId(entityStringId);
-            troop.setInDefensiveStance(false);
-            troop.setDefensePosition(null);
-            log.info("Troop {} defensive stance disabled", entityStringId);
+            Minion minion = (Minion) gameState.getEntityByStringId(entityStringId);
+            minion.setInDefensiveStance(false);
+            minion.setDefensePosition(null);
+            log.info("Minion {} defensive stance disabled", entityStringId);
         }
 
         AttackContext attackContext = attackContextFactory.createAttackContext(

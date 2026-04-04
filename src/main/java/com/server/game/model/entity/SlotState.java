@@ -41,7 +41,7 @@ public class SlotState {
     @Delegate
     final GoldComponent goldComponent;
 
-    final Set<Troop> troops;
+    final Set<Minion> minions;
 
     public SlotState(GameState gameState, Short slot, Champion champion, Set<Tower> towers, Burg bug, Integer initialGold) {
         this.gameState = gameState;
@@ -50,15 +50,19 @@ public class SlotState {
         this.towers = (towers != null) ? towers : new HashSet<>();
         this.burg = bug;
         this.goldComponent = new GoldComponent(initialGold);
-        this.troops = new HashSet<>();
+        this.minions = new HashSet<>();
     }
 
-    public void addTroop(Troop troop) {
-        if (troop == null) {
-            log.error(">>> [SlotState] Cannot add null troop");
+    public Short getSlotNumber() {
+        return this.slot;
+    }
+
+    public void addMinion(Minion minion) {
+        if (minion == null) {
+            log.error(">>> [SlotState] Cannot add null minion");
             return;
         }
-        this.troops.add(troop);
+        this.minions.add(minion);
     }
 
     public boolean isChampionAlive(){
@@ -93,11 +97,11 @@ public class SlotState {
         this.setCurrentHP(this.getMaxHP());
     }
 
-    public void addTroopInstance(Troop troopInstance){
-        this.troops.add(troopInstance);
+    public void addMinionInstance(Minion minionInstance){
+        this.minions.add(minionInstance);
     }
 
-    public int getTroopCount(){ return this.troops.size(); }
+    public int getMinionCount(){ return this.minions.size(); }
 
     @Override
     public boolean equals(Object other) {
@@ -111,8 +115,8 @@ public class SlotState {
      * Get player status summary
      */
     public String getStatusSummary() {
-        return String.format("Slot %d (%s): HP %d/%d, Gold: %d, Troops: %d, Alive: %s",
-                slot, champion.getChampionEnum(), getCurrentHP(), getMaxHP(), getCurrentGold(), getTroopCount(),
+        return String.format("Slot %d (%s): HP %d/%d, Gold: %d, Minions: %d, Alive: %s",
+                slot, champion.getChampionEnum(), getCurrentHP(), getMaxHP(), getCurrentGold(), getMinionCount(),
                 champion.isAlive());
     }
 }

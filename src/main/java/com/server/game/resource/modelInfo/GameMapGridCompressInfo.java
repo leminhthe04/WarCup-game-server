@@ -1,4 +1,4 @@
-package com.server.game.resource.model;
+package com.server.game.resource.modelInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ import lombok.AccessLevel;
 @Data
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GameMapGridCompress {
+public class GameMapGridCompressInfo {
     Short id;
     String name;
     Vector2 cornerA;

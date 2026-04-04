@@ -1,7 +1,7 @@
 package com.server.game.service.champion;
 
-import com.server.game.resource.model.ChampionDB;
-import com.server.game.resource.repository.ChampionDBRepository;
+import com.server.game.repository.mongo.ChampionDBRepository;
+import com.server.game.resource.modelInfo.ChampionInfo;
 import com.server.game.util.ChampionEnum;
 
 import lombok.AccessLevel;
@@ -21,7 +21,7 @@ public class ChampionService {
     
     ChampionDBRepository championRepository;
 
-    public ChampionDB getChampionDBById(ChampionEnum championEnum) {
+    public ChampionInfo getChampionDBById(ChampionEnum championEnum) {
         return championRepository.findById(championEnum.getChampionId()).orElseGet(() -> {
             log.info("Champion with id " + championEnum.getChampionId() + " not found.");
             return null;

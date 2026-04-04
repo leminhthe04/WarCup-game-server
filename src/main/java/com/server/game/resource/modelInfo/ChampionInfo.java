@@ -1,4 +1,4 @@
-package com.server.game.resource.model;
+package com.server.game.resource.modelInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChampionDB {
+public class ChampionInfo {
 
     Short id;
     String name;

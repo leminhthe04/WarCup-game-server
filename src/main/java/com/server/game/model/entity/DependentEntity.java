@@ -12,8 +12,8 @@ public abstract class DependentEntity extends Entity {
 
     protected final SlotState ownerSlot;
 
-    public DependentEntity(String stringId, GameState gameState, SlotState ownerSlot) {
-        super(stringId, gameState);
+    public DependentEntity(String stringId, SlotState ownerSlot) {
+        super(stringId, ownerSlot.getGameState());
         this.ownerSlot = ownerSlot;
     }
 

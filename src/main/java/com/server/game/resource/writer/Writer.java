@@ -8,15 +8,15 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.server.game.resource.model.GameMap;
-import com.server.game.resource.model.ChampionDB;
-import com.server.game.resource.model.GameMapGrid;
-import com.server.game.resource.model.TroopDB;
+import com.server.game.repository.mongo.ChampionDBRepository;
+import com.server.game.repository.mongo.GameMapRepository;
+import com.server.game.repository.mongo.MinionDBRepository;
+import com.server.game.resource.modelInfo.ChampionInfo;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
+import com.server.game.resource.modelInfo.GameMapInfo;
+import com.server.game.resource.modelInfo.MinionInfo;
 import com.server.game.resource.reader.JsonReader;
-import com.server.game.resource.repository.ChampionDBRepository;
-import com.server.game.resource.repository.GameMapRepository;
-import com.server.game.resource.repository.TroopDBRepository;
-import com.server.game.resource.service.GameMapGridService;
+import com.server.game.service.gameMapGrid.GameMapGridService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class Writer {
     JsonReader jsonReader;
     GameMapRepository mapRepository;
     ChampionDBRepository championDBRepository;
-    TroopDBRepository troopDBRepository;
+    MinionDBRepository troopDBRepository;
 
     GameMapGridService gameMapGridService;
 
@@ -68,7 +68,7 @@ public class Writer {
 
 
     private void writeMap(String mapName) {
-        GameMap map = jsonReader.readGameMapFromJson(mapName);
+        GameMapInfo map = jsonReader.readGameMapFromJson(mapName);
         if (map == null) {
             log.info("Failed to read map from JSON.");
             return;
@@ -92,7 +92,7 @@ public class Writer {
 
 
     private void writeGameMapGrid(String mapName) {
-        GameMapGrid mapGrid = jsonReader.readGameMapGridFromJson(mapName);
+        GameMapGridInfo mapGrid = jsonReader.readGameMapGridFromJson(mapName);
         if (mapGrid == null) {
             log.info("Failed to read map grid from JSON.");
             return;
@@ -116,7 +116,7 @@ public class Writer {
     }
 
     private void writeChampion(String championName) {
-        ChampionDB champion = jsonReader.readChampionFromJson(championName);
+        ChampionInfo champion = jsonReader.readChampionFromJson(championName);
         if (champion == null) {
             log.info("Failed to read champion from JSON.");
             return;
@@ -140,12 +140,12 @@ public class Writer {
     }
 
     private void writeTroop(String troopName) {
-        TroopDB troop = jsonReader.readTroopFromJson(troopName);
-        if (troop == null) {
-            log.info("Failed to read troop from JSON.");
+        MinionInfo minion = jsonReader.readTroopFromJson(troopName);
+        if (minion == null) {
+            log.info("Failed to read minion from JSON.");
             return;
         }
-        troopDBRepository.save(troop);
-        log.info("Troop saved successfully: " + troop.getName());
+        troopDBRepository.save(minion);
+        log.info("Troop saved successfully: " + minion.getName());
     }
 }

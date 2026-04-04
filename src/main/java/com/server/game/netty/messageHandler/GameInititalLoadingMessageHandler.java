@@ -9,8 +9,8 @@ import com.server.game.model.entity.GameState;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.initialGameState.ChampionInitialStatsSend;
 import com.server.game.netty.sendObject.initialGameState.InitialPositionsSend;
-import com.server.game.resource.model.TroopDB;
-import com.server.game.resource.service.TroopService;
+import com.server.game.resource.modelInfo.MinionInfo;
+import com.server.game.service.minion.MinionService;
 import com.server.game.service.gameState.GameCoordinator;
 
 import io.netty.channel.Channel;
@@ -28,7 +28,7 @@ public class GameInititalLoadingMessageHandler {
 
     GameStateFactory gameStateBuilder;
     GameCoordinator gameCoordinator;
-    TroopService troopService;
+    MinionService troopService;
     
     // This method is called by LobbyHandler when all players are ready
     public void loadInitial(Channel channel) {
@@ -65,7 +65,7 @@ public class GameInititalLoadingMessageHandler {
         // Send message is unicast, need to get all channels in room and send one by one
         Set<Channel> playersInRoom = ChannelManager.getGameChannelsByInnerChannel(channel);
 
-        Set<TroopDB> allTroopDBs = troopService.getAllTroops();
+        Set<MinionInfo> allMinionDBs = troopService.getAllMinions();
 
         ChannelFuture lastFuture = null;
         for (Channel playerChannel : playersInRoom) {
@@ -78,7 +78,7 @@ public class GameInititalLoadingMessageHandler {
             Integer initGold = gameState.peekGold(slot);
 
             ChampionInitialStatsSend championInitialStatsSend = 
-                new ChampionInitialStatsSend(champion, initGold, allTroopDBs);
+                new ChampionInitialStatsSend(champion, initGold, allMinionDBs);
 
             lastFuture = playerChannel.writeAndFlush(championInitialStatsSend);
         }

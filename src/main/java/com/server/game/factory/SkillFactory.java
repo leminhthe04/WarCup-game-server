@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.championSkill.*;
 import com.server.game.model.entity.component.skillComponent.SkillComponent;
-import com.server.game.resource.model.ChampionDB.ChampionAbility;
+import com.server.game.resource.modelInfo.ChampionInfo.ChampionAbility;
 import com.server.game.util.ChampionEnum;
 
 @Component

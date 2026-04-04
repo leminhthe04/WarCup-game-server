@@ -9,7 +9,7 @@ import com.server.game.factory.AttackContextFactory;
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
-import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.building.Burg;
 import com.server.game.model.entity.building.Tower;
 import com.server.game.service.attack.AttackService;
@@ -122,7 +122,7 @@ public class DefenseService {
             .filter(Entity::isAlive)
             .filter(e -> e.getOwnerSlot() != null)
             .filter(e -> e.getOwnerSlot().getSlot() != defender.getOwnerSlot().getSlot()) // Is an enemy
-            .filter(e -> e instanceof Troop)
+            .filter(e -> e instanceof Minion)
             .filter(e -> defender.distanceTo(e) <= attackRange)
             .min(Comparator.comparing(e -> defender.distanceTo(e)));
 

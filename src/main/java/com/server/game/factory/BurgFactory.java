@@ -3,7 +3,7 @@ package com.server.game.factory;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.building.Burg;
-import com.server.game.resource.model.SlotInfo.BurgDB;
+import com.server.game.resource.modelInfo.SlotInfo.BurgDB;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

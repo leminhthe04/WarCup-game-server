@@ -2,14 +2,13 @@ package com.server.game.model.entity.championSkill;
 
 import java.util.Set;
 
-import com.server.game.resource.model.ChampionDB.ChampionAbility;
-
 import lombok.extern.slf4j.Slf4j;
 
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.component.skillComponent.DurationSkillComponent;
 import com.server.game.model.entity.entityIface.SkillReceivable;
 import com.server.game.model.map.shape.CircleShape;
+import com.server.game.resource.modelInfo.ChampionInfo.ChampionAbility;
 
 // Xoay rìu trong 3.5s, mỗi giây gây sát thương phạm vi xung quanh 
 @Slf4j

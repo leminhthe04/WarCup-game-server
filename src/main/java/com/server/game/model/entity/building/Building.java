@@ -37,7 +37,7 @@ public abstract class Building extends DependentEntity implements HasFixedPositi
         String dbId, Vector2 initPosition,
         float width, float length, float rotate) {
 
-        super(stringId, gameState, ownerSlot);
+        super(stringId, ownerSlot);
 
         this.dbId = dbId;
         this.position = initPosition;

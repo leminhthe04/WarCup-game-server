@@ -1,4 +1,4 @@
-package com.server.game.resource.model;
+package com.server.game.resource.modelInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

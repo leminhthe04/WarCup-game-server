@@ -2,7 +2,7 @@ package com.server.game.model.entity.component.skillComponent;
 import org.springframework.stereotype.Component;
 
 import com.server.game.model.entity.Champion;
-import com.server.game.resource.model.ChampionDB.ChampionAbility;
+import com.server.game.resource.modelInfo.ChampionInfo.ChampionAbility;
 import com.server.game.util.Util;
 
 import lombok.Data;

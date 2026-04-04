@@ -9,10 +9,8 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import com.server.game.resource.model.GameMap;
-import com.server.game.resource.model.GameMapGrid;
-import com.server.game.resource.service.GameMapGridService;
-import com.server.game.resource.service.GameMapService;
+import com.server.game.service.gameMap.GameMapService;
+import com.server.game.service.gameMapGrid.GameMapGridService;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.util.ChampionEnum;
 
@@ -20,6 +18,8 @@ import io.netty.channel.Channel;
 
 import com.server.game.model.entity.GameState;
 import com.server.game.netty.ChannelManager;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
+import com.server.game.resource.modelInfo.GameMapInfo;
 
 import lombok.AccessLevel;
 
@@ -46,8 +46,8 @@ public class GameStateFactory {
         Map<Short, ChampionEnum> slot2ChampionId = ChannelManager.getSlot2ChampionEnum(gameId);
 
 
-        GameMap gameMap = gameMapService.getGameMapById(gameMapId);
-        GameMapGrid gameMapGrid = gameMapGridService.getGameMapGridById(gameMapId);
+        GameMapInfo gameMap = gameMapService.getGameMapById(gameMapId);
+        GameMapGridInfo gameMapGrid = gameMapGridService.getGameMapGridById(gameMapId);
 
         GameState gameState = new GameState(gameId, gameMap, gameMapGrid, slot2ChampionId, 
             gameStateService, slotStateFactory);
@@ -61,8 +61,8 @@ public class GameStateFactory {
         
         Short gameMapId = (short) slot2ChampionId.size(); // GameMap id is determined by the number of players
         
-        GameMap gameMap = gameMapService.getGameMapById(gameMapId);
-        GameMapGrid gameMapGrid = gameMapGridService.getGameMapGridById(gameMapId);
+        GameMapInfo gameMap = gameMapService.getGameMapById(gameMapId);
+        GameMapGridInfo gameMapGrid = gameMapGridService.getGameMapGridById(gameMapId);
 
         GameState gameState = new GameState(gameId, gameMap, gameMapGrid, slot2ChampionId, 
             gameStateService, slotStateFactory);
