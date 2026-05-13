@@ -9,7 +9,6 @@ import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.entity.EntityDeathSend;
-import com.server.game.repository.mongo.MinionDBRepository;
 import com.server.game.resource.modelInfo.MinionInfo;
 import com.server.game.service.attack.AttackService;
 import com.server.game.service.gameState.GameStateService;
@@ -20,16 +19,12 @@ import com.server.game.util.MinionEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
 import io.netty.channel.Channel;
-import jakarta.annotation.PostConstruct;
 
 @Slf4j
 @Service
@@ -39,28 +34,11 @@ public class MinionService {
     private final GameStateService gameStateService;
     private final SlotStateService slotStateService;
     private final MinionFactory minionFactory;
-
     private final AttackContextFactory attackContextFactory;
     private final AttackService attackService;
 
-    // Store minion instance to create minionInstance2 instances
-    private final Map<MinionEnum, MinionInfo> minionDBCache = new HashMap<>();
-
-    @PostConstruct
-    public void initCache(MinionDBRepository minionDBRepository) {
-        // Preload all minionDBs into the cache
-        List<MinionInfo> allMinionDBs = minionDBRepository.findAll();
-        for (MinionInfo minionDB : allMinionDBs) {
-            minionDBCache.put(MinionEnum.fromShort(minionDB.getId()), minionDB);
-        }
-    }
-
-    public MinionInfo getMinionDBById(MinionEnum minionEnum) {
-        return minionDBCache.get(minionEnum);
-    }
-
     public Set<MinionInfo> getAllMinions() {
-        return new HashSet<MinionInfo>(minionDBCache.values());
+        return minionFactory.getAllMinions();
     }
 
     /**

@@ -28,7 +28,7 @@ public class GameInititalLoadingMessageHandler {
 
     GameStateFactory gameStateBuilder;
     GameCoordinator gameCoordinator;
-    MinionService troopService;
+    MinionService minionService;
     
     // This method is called by LobbyHandler when all players are ready
     public void loadInitial(Channel channel) {
@@ -65,7 +65,7 @@ public class GameInititalLoadingMessageHandler {
         // Send message is unicast, need to get all channels in room and send one by one
         Set<Channel> playersInRoom = ChannelManager.getGameChannelsByInnerChannel(channel);
 
-        Set<MinionInfo> allMinionDBs = troopService.getAllMinions();
+        Set<MinionInfo> allMinionDBs = minionService.getAllMinions();
 
         ChannelFuture lastFuture = null;
         for (Channel playerChannel : playersInRoom) {
