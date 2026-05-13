@@ -292,7 +292,7 @@ public class ThetaStarPathfinder {
         }
 
         // print path for debugging
-        log.info("Path found: " + path);
+        // log.info("Path found: " + path);
 
         // Convert LinkedList to ArrayList to access by index later
         return new ArrayList<>(path);

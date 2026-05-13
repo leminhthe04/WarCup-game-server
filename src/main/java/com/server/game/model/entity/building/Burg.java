@@ -101,7 +101,7 @@ public final class Burg extends Building {
             this.getGameId(), removedEntityIds, 
             killer.getAttackContext().getTimestamp());
         
-        ownerSlot.setEliminated(true);
+        // ownerSlot.setEliminated(true);
 
         for(Entity entity : entitiesToRemove) {
             gameState.removeEntity(entity);

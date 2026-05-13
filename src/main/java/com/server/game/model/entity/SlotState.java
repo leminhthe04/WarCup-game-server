@@ -35,8 +35,7 @@ public class SlotState {
 
     Burg burg;
 
-    @Getter @Setter
-    private boolean eliminated = false;
+    // boolean eliminated = false;
 
     @Delegate
     final GoldComponent goldComponent;
@@ -51,6 +50,10 @@ public class SlotState {
         this.burg = burg;
         this.goldComponent = new GoldComponent(initialGold);
         this.minions = new HashSet<>();
+    }
+
+    public boolean isEliminated() {
+        return !this.getBurg().isAlive();
     }
 
     public void addMinion(Minion minion) {

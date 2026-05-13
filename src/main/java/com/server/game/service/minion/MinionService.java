@@ -5,6 +5,7 @@ import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.building.Burg;
+import com.server.game.model.entity.building.Tower;
 import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
@@ -91,12 +92,27 @@ public class MinionService {
 
         // TODO: Handle if there are more than one opponent (in 3+ player games)
         SlotState targetSlot = opponentSlots.get(0);
-        Burg targetBurg = slotStateService.getBurg(targetSlot);
+        
+        List<Tower> sortedTowers = slotStateService.getTowers(targetSlot);
+        // a first alive Tower in list above. 
+        // if all targetSlot's towers are not alive, it's a Burg
+        Entity targetEntity = null;
+        for (Tower tower : sortedTowers) {
+            if (tower.isAlive()) {
+                targetEntity = tower;
+                break;
+            }
+        }
 
-        this.setAttackTarget(newMinion, targetBurg);
+        if (targetEntity == null) {
+            Burg targetBurg = slotStateService.getBurg(targetSlot);
+            targetEntity = targetBurg;
+        }
 
-        log.info("Minion spawned and move toward to opponent's burg to attack. MinionId: {}, TargetBurgId: {}",
-                newMinion.getStringId(), targetBurg.getStringId());
+        this.setAttackTarget(newMinion, targetEntity);
+
+        log.info("Minion spawned and move toward to opponent's tower or burg to attack. MinionId: {}, TargetBuildingId: {}",
+                newMinion.getStringId(), targetEntity.getStringId());
     }
 
     /**
