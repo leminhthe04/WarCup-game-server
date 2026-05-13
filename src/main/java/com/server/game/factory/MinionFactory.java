@@ -2,6 +2,7 @@ package com.server.game.factory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,7 +25,7 @@ import com.server.game.resource.modelInfo.MinionInfo;
 
 import lombok.AccessLevel;
 
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -33,7 +34,6 @@ public class MinionFactory {
     GameStateService gameStateService;
     SlotStateService slotStateService;
     MinionDBRepository minionDBRepository;
-
 
     // Store minion instance to create minionInstance2 instances
     private final Map<MinionEnum, MinionInfo> minionDBCache = new HashMap<>();
@@ -55,8 +55,6 @@ public class MinionFactory {
         return new HashSet<MinionInfo>(minionDBCache.values());
     }
 
-
-
     public Minion createMinion(SlotState slotState, MinionEnum minionType) {
         GameState gameState = slotState.getGameState();
         if (gameState == null) {
@@ -65,23 +63,25 @@ public class MinionFactory {
 
         MinionInfo minionDB = this.getMinionDBById(minionType);
         if (minionDB == null) {
+            log.warn("DB has no minion type={}", minionType);
             return null;
         }
 
         if (gameState.peekGold(slotState) < minionDB.getCost()) {
+            log.warn("Not enough gold to spawn minion, current gold: {}, minion cost: {}",
+                    gameState.peekGold(slotState), minionDB.getCost());
             return null;
         }
 
         Minion minionInstance = new Minion(
-            minionDB,
-            slotState
-        );
+                minionDB,
+                slotState);
 
         gameState.spendGold(slotState, minionDB.getCost());
 
         gameStateService.addEntityTo(gameState, minionInstance);
         slotStateService.addMinion(slotState, minionInstance);
-        
+
         return minionInstance;
     }
 }
