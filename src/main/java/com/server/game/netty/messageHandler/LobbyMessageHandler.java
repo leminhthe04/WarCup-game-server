@@ -64,9 +64,12 @@ public class LobbyMessageHandler {
         String gameId = ChannelManager.getGameIdByChannel(channel);
         Set<Channel> playersInRoom = ChannelManager.getChannelsByGameId(gameId);
         log.info("Room has " + playersInRoom.size() + " players.");
+        
         boolean isAllPlayersReady = playersInRoom.stream() // fun sân nồ prồ ram minh
             .allMatch(ChannelManager::isUserReady);
+        
         log.info("Is all players ready? " + isAllPlayersReady);
+        
         PlayerReadySend playerReadySend = new PlayerReadySend(
             ChannelManager.getSlotByChannel(channel),
             isAllPlayersReady

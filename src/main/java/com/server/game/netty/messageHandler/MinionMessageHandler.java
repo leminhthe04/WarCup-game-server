@@ -16,9 +16,11 @@ import com.server.game.netty.sendObject.minion.MinionCooldownSend;
 import com.server.game.service.gameState.GameCoordinator;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.minion.MinionService;
+import com.server.game.service.move.MoveService;
 import com.server.game.util.MinionEnum;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,6 +42,7 @@ public class MinionMessageHandler {
     MinionService minionService;
     GameCoordinator gameCoordinator;
     GameStateService gameStateService;
+    MoveService moveService;
 
     // Cooldown tracking: gameId:slot:minionType -> timestamp when cooldown ends
     private final Map<String, Long> rateLimiter = new ConcurrentHashMap<>();
@@ -103,9 +106,16 @@ public class MinionMessageHandler {
                 request.getMinionId(), (short) (TROOP_SPAWN_LIMIT_MS / 1000));
         channel.writeAndFlush(cooldownMessage);
 
-        minionService.afterMinionSpawning(newMinion);
-
-        this.broadcastMinionSpawn(newMinion);
+        ChannelFuture future = this.broadcastMinionSpawn(newMinion, channel);
+        if (future != null) {
+            future.addListener(f -> {
+                if (f.isSuccess()) {
+                    minionService.afterMinionSpawning(newMinion);
+                } else {
+                    log.warn("Error when broadcasting minion spawn");
+                }
+            });
+        }
 
         log.info("Minion spawned successfully: {}, cooldown set for {} seconds",
                 minionType, TROOP_SPAWN_LIMIT_MS / 1000);
@@ -148,22 +158,20 @@ public class MinionMessageHandler {
             Vector2 moveToPosition = spreadMoveToPositions.get(i);
 
             // Verify the minion belongs to the requesting slot for security
-            Entity minionEntity = gameState.getEntityByStringId(minionId);
-            if (minionEntity == null || !(minionEntity instanceof Minion)) {
+            Entity entity = gameState.getEntityByStringId(minionId);
+            if (entity == null || !(entity instanceof Minion)) {
                 log.warn("Minion {} not found or invalid type", minionId);
                 continue;
             }
 
-            Minion minion = (Minion) minionEntity;
+            Minion minion = (Minion) entity;
             if (minion.getOwnerSlot().getSlotNumber() != requestingSlot) {
                 log.warn("Player {} attempted to move minion {} owned by slot {}",
                         requestingSlot, minionId, minion.getOwnerSlot().getSlotNumber());
                 continue;
             }
 
-            // TODO
-            // Set the new position for the minion
-            // minionService.setMovePosition(gameId, minionId, moveToPosition);
+            moveService.setMove(minion, moveToPosition, true);
 
             log.debug("Moved minion {} to spread position {}", minionId, moveToPosition);
         }
@@ -248,12 +256,12 @@ public class MinionMessageHandler {
     // return null;
     // }
 
-    private void broadcastMinionSpawn(Minion minion) {
+    private ChannelFuture broadcastMinionSpawn(Minion minion, Channel channel) {
 
         Set<Channel> gameChannels = ChannelManager.getChannelsByGameId(minion.getGameId());
         if (gameChannels == null || gameChannels.isEmpty()) {
             log.warn("No active channels found for game ID: {}", minion.getGameId());
-            return;
+            return null;
         }
 
         // Calculate rotation based on position to the center point (0,0)
@@ -264,14 +272,19 @@ public class MinionMessageHandler {
         MinionSpawnSend minionSpawnSend = new MinionSpawnSend(minion, rotate);
 
         // Broadcast the minion spawn message to all players in the game
+        ChannelFuture lastFuture = null;
         for (Channel playerChannel : gameChannels) {
             if (playerChannel.isActive()) {
-                playerChannel.writeAndFlush(minionSpawnSend);
+                lastFuture = playerChannel.writeAndFlush(minionSpawnSend);
             } else {
                 log.warn("Inactive channel found for game ID: {}, slot: {}", minion.getGameState().getGameId(),
                         minion.getOwnerSlot().getSlotNumber());
             }
         }
+
+        return lastFuture == null
+                ? channel.newSucceededFuture()
+                : lastFuture;
     }
 
     /**

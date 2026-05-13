@@ -7,8 +7,6 @@ import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.building.Burg;
 import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
-import com.server.game.model.entity.context.MoveContext;
-import com.server.game.model.map.component.Vector2;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.entity.EntityDeathSend;
 import com.server.game.repository.mongo.MinionDBRepository;
@@ -17,8 +15,6 @@ import com.server.game.service.attack.AttackService;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.gameState.SlotStateService;
 import com.server.game.factory.AttackContextFactory;
-import com.server.game.factory.MoveContextFactory;
-import com.server.game.service.move.MoveService;
 import com.server.game.util.MinionEnum;
 
 import lombok.RequiredArgsConstructor;
@@ -43,9 +39,6 @@ public class MinionService {
     private final GameStateService gameStateService;
     private final SlotStateService slotStateService;
     private final MinionFactory minionFactory;
-
-    private final MoveContextFactory moveContextFactory;
-    private final MoveService moveService;
 
     private final AttackContextFactory attackContextFactory;
     private final AttackService attackService;
@@ -113,6 +106,10 @@ public class MinionService {
         List<SlotState> opponentSlots = slotStates.stream()
                 .filter(slotState -> !slotState.equals(newMinion.getOwnerSlot()))
                 .toList();
+
+        if (opponentSlots == null || opponentSlots.size() < 1) {
+            log.error("cannot find opponent slot to set minion attack");
+        }
 
         // TODO: Handle if there are more than one opponent (in 3+ player games)
         SlotState targetSlot = opponentSlots.get(0);

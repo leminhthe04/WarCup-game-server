@@ -96,7 +96,6 @@ public class UserService {
     }
 
     private void invalidatePreviousSession(String previousSessionId) {
-        // TODO Auto-generated method stub
         activeSessions.values().removeIf(sessionId -> sessionId.equals(previousSessionId));
     }
 
