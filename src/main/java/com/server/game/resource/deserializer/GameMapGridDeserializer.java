@@ -6,16 +6,16 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.GameMapGrid;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
 
 import java.io.IOException;
 
 
 
-public class GameMapGridDeserializer extends JsonDeserializer<GameMapGrid> {
+public class GameMapGridDeserializer extends JsonDeserializer<GameMapGridInfo> {
 
     @Override
-    public GameMapGrid deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
+    public GameMapGridInfo deserialize(JsonParser parser, DeserializationContext ctxt) throws IOException {
         ObjectCodec codec = parser.getCodec();
         JsonNode node = codec.readTree(parser);
 
@@ -50,6 +50,6 @@ public class GameMapGridDeserializer extends JsonDeserializer<GameMapGrid> {
             }
         }
 
-        return new GameMapGrid(id, name, cornerA, cornerB, nRows, nCols, cellSize, grid);
+        return new GameMapGridInfo(id, name, cornerA, cornerB, nRows, nCols, cellSize, grid);
     }
 }

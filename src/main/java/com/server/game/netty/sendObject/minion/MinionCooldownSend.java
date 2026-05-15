@@ -1,4 +1,4 @@
-package com.server.game.netty.sendObject.troop;
+package com.server.game.netty.sendObject.minion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -18,7 +18,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TroopCooldownSend implements TLVEncodable {
+public class MinionCooldownSend implements TLVEncodable {
     short troopType;
     short cooldownTime;
 

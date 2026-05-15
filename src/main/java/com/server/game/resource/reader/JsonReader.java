@@ -1,10 +1,10 @@
 package com.server.game.resource.reader;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.server.game.resource.model.GameMap;
-import com.server.game.resource.model.ChampionDB;
-import com.server.game.resource.model.GameMapGrid;
-import com.server.game.resource.model.TroopDB;
+import com.server.game.resource.modelInfo.ChampionInfo;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
+import com.server.game.resource.modelInfo.GameMapInfo;
+import com.server.game.resource.modelInfo.MinionInfo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class JsonReader {
 
     ObjectMapper objectMapper;
 
-    public GameMap readGameMapFromJson(String mapName) {
+    public GameMapInfo readGameMapFromJson(String mapName) {
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("game/map/" + mapName + ".json");
             if (is == null) {
@@ -33,7 +33,7 @@ public class JsonReader {
                 log.info(">>> File not found: resources/game/map/" + mapName + ".json");
                 return null;
             }
-            return objectMapper.readValue(is, GameMap.class);
+            return objectMapper.readValue(is, GameMapInfo.class);
 
         } catch (IOException e) {
             // e.printStackTrace();
@@ -42,7 +42,7 @@ public class JsonReader {
         }
     }
 
-    public GameMapGrid readGameMapGridFromJson(String mapName) {
+    public GameMapGridInfo readGameMapGridFromJson(String mapName) {
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("game/map/" + mapName + "_grid.json");
             if (is == null) {
@@ -50,7 +50,7 @@ public class JsonReader {
                 log.info(">>> File not found: resources/game/map/" + mapName + "_grid.json");
                 return null;
             }
-            return objectMapper.readValue(is, GameMapGrid.class);
+            return objectMapper.readValue(is, GameMapGridInfo.class);
 
         } catch (IOException e) {
             // e.printStackTrace();
@@ -59,7 +59,7 @@ public class JsonReader {
         }
     }   
 
-    public ChampionDB readChampionFromJson(String championName) {
+    public ChampionInfo readChampionFromJson(String championName) {
         try {
             InputStream is = getClass().getClassLoader().getResourceAsStream("game/champion/" + championName + ".json");
             if (is == null) {
@@ -67,7 +67,7 @@ public class JsonReader {
                 log.info(">>> File not found: resources/game/champion/" + championName + ".json");
                 return null;
             }
-            return objectMapper.readValue(is, ChampionDB.class);
+            return objectMapper.readValue(is, ChampionInfo.class);
 
         } catch (IOException e) {
             // e.printStackTrace();
@@ -76,19 +76,19 @@ public class JsonReader {
         }
     }
 
-    public TroopDB readTroopFromJson(String troopName) {
+    public MinionInfo readTroopFromJson(String troopName) {
         try {
-            InputStream is = getClass().getClassLoader().getResourceAsStream("game/troop/" + troopName + ".json");
+            InputStream is = getClass().getClassLoader().getResourceAsStream("game/minion/" + troopName + ".json");
             if (is == null) {
-                // throw new FileNotFoundException("File not found: resources/game/troop/" + troopName + ".json");
-                log.info(">>> File not found: resources/game/troop/" + troopName + ".json");
+                // throw new FileNotFoundException("File not found: resources/game/minion/" + troopName + ".json");
+                log.info(">>> File not found: resources/game/minion/" + troopName + ".json");
                 return null;
             }
-            return objectMapper.readValue(is, TroopDB.class);
+            return objectMapper.readValue(is, MinionInfo.class);
 
         } catch (IOException e) {
             // e.printStackTrace();
-            log.info(">>> Error reading troop JSON: " + e.getMessage());
+            log.info(">>> Error reading minion JSON: " + e.getMessage());
             return null;
         }
     }

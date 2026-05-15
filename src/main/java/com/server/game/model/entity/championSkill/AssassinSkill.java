@@ -7,7 +7,7 @@ import com.server.game.model.entity.component.skillComponent.SkillComponent;
 import com.server.game.model.entity.entityIface.SkillReceivable;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.model.map.shape.RectShape;
-import com.server.game.resource.model.ChampionDB.ChampionAbility;
+import com.server.game.resource.modelInfo.ChampionInfo.ChampionAbility;
 import com.server.game.util.ThetaStarPathfinder;
 
 import lombok.extern.slf4j.Slf4j;

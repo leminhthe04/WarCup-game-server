@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 import com.server.game.factory.SlotStateFactory;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.GameMap;
-import com.server.game.resource.model.GameMap.Playground;
-import com.server.game.resource.model.GameMapGrid;
-import com.server.game.resource.model.SlotInfo;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
+import com.server.game.resource.modelInfo.GameMapInfo;
+import com.server.game.resource.modelInfo.SlotInfo;
+import com.server.game.resource.modelInfo.GameMapInfo.Playground;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.util.ChampionEnum;
 import com.server.game.util.Util;
@@ -27,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GameState {
     final String gameId;
-    final GameMap gameMap;
-    final GameMapGrid gameMapGrid;
+    final GameMapInfo gameMap;
+    final GameMapGridInfo gameMapGrid;
 
     long currentTick = 0;
     long nextGoldMineGenerationTick;
@@ -43,8 +43,8 @@ public class GameState {
     Integer numSlotsAlive;
 
 
-    public GameState(String gameId, GameMap gameMap,
-        GameMapGrid gameMapGrid, 
+    public GameState(String gameId, GameMapInfo gameMap,
+        GameMapGridInfo gameMapGrid, 
         Map<Short, ChampionEnum> slot2ChampionEnum, 
         GameStateService gameStateService, 
         SlotStateFactory slotStateFactory) {
@@ -148,7 +148,7 @@ public class GameState {
                     entry -> entry.getValue().getChampion()));
     }
 
-    public Float getSpeed(Short slot) {
+    public Float getChampionSpeed(Short slot) {
         SlotState slotState = slotStates.get(slot);
         if (slotState != null) {
             Champion champion = slotState.getChampion();
@@ -161,6 +161,10 @@ public class GameState {
 
     public Short getGameMapId() {
         return gameMap.getId();
+    }
+
+    public List<SlotState> getAllSlotStates() {
+        return slotStates.values().stream().toList();
     }
 
     public List<SlotInfo> getSlotInfos() {
@@ -178,11 +182,11 @@ public class GameState {
 
 
     public Vector2 getSpawnPosition(SlotState slotState) {
-        return this.getSpawnPosition(slotState.getSlot());
+        return this.getSpawnPosition(slotState.getSlotNumber());
     }
 
     public float getSpawnRotate(SlotState slotState) {
-        Float rotateValue = gameMap.getInitialRotate(slotState.getSlot());
+        Float rotateValue = gameMap.getInitialRotate(slotState.getSlotNumber());
         if (rotateValue == null) {
             Vector2 spawnPos = getSpawnPosition(slotState);
             if (spawnPos != null) {
@@ -294,7 +298,7 @@ public class GameState {
 
     public void handleGoldChange(SlotState slotState) {
         this.getGameStateService()
-            .sendGoldChangeMessage(gameId, slotState.getSlot(), slotState.getCurrentGold());
+            .sendGoldChangeMessage(gameId, slotState.getSlotNumber(), slotState.getCurrentGold());
     }
 
     public SlotState getSlotState(short slot) {

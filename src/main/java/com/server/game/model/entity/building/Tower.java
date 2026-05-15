@@ -9,7 +9,7 @@ import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.attackStrategy.TowerAttackStrategy;
 import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.context.AttackContext;
-import com.server.game.resource.model.SlotInfo.TowerDB;
+import com.server.game.resource.modelInfo.SlotInfo.TowerDB;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -27,7 +27,7 @@ public final class Tower extends Building {
     final AttackComponent attackComponent;
 
     public Tower(SlotState ownerSlot, GameState gameState, TowerDB towerDB) {
-        super("tower_" + ownerSlot.getSlot() + UUID.randomUUID().toString(),
+        super("tower_" + ownerSlot.getSlotNumber() + UUID.randomUUID().toString(),
         ownerSlot, gameState, 
         gameState.getGameMap().getTowerHP(), 
         gameState.getGameMap().getTowerDefense(), 

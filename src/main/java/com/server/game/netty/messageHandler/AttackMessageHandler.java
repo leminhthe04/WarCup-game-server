@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.server.game.annotation.customAnnotation.MessageMapping;
 import com.server.game.factory.AttackContextFactory;
-import com.server.game.model.entity.GameState;
-import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.Entity;
+import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.receiveObject.attack.AttackReceive;
@@ -27,25 +27,24 @@ public class AttackMessageHandler {
 
     private final AttackContextFactory attackContextFactory;
     private final AttackService attackService;
-    
 
     // Rate limiting: minimum time between position updates (in milliseconds)
     private static final long MIN_UPDATE_INTERVAL = 50; // 50ms = max 20 updates per second
     private final Map<String, Long> lastUpdateTime = new ConcurrentHashMap<>();
 
-
     @MessageMapping(AttackReceive.class)
     public void handleAttackMessage(AttackReceive receiveObject, Channel channel) {
         String gameId = ChannelManager.getGameIdByChannel(channel);
-        String entityStringId = receiveObject.getAttackerId();
+        String attackerStringId = receiveObject.getAttackerId();
+        String targetStringId = receiveObject.getTargetId();
 
-        long clientTimestamp = receiveObject.getTimestamp();
-        
+        // long clientTimestamp = receiveObject.getTimestamp();
+
         // Rate limiting check
-        String playerKey = gameId + ":" + entityStringId;
+        String playerKey = gameId + ":" + attackerStringId;
         long currentTime = System.currentTimeMillis();
         Long lastUpdate = lastUpdateTime.get(playerKey);
-        
+
         if (lastUpdate != null && (currentTime - lastUpdate) < MIN_UPDATE_INTERVAL) {
             log.debug("Rate limit exceeded for player: {} - ignore attack position update", playerKey);
             return;
@@ -54,23 +53,34 @@ public class AttackMessageHandler {
         // Update the last update time
         lastUpdateTime.put(playerKey, currentTime);
 
-        if (entityStringId.equals(receiveObject.getTargetId())) {
+        Entity attacker = gameStateService.getEntityByStringId(gameId, attackerStringId);
+        Entity target = gameStateService.getEntityByStringId(gameId, targetStringId);
+
+        if (attacker == null) {
+            log.warn("Attacker not found: {}", attackerStringId);
             return;
         }
 
-        if (entityStringId.startsWith("troop_") ) {
-            GameState gameState = gameStateService.getGameStateById(gameId);
-            Troop troop = (Troop) gameState.getEntityByStringId(entityStringId);
-            troop.setInDefensiveStance(false);
-            troop.setDefensePosition(null);
-            log.info("Troop {} defensive stance disabled", entityStringId);
+        if (target == null) {
+            log.warn("Target not found: {}", targetStringId);
+            return;
         }
 
-        AttackContext attackContext = attackContextFactory.createAttackContext(
-            gameId, entityStringId, receiveObject.getTargetId(), clientTimestamp);
+        // Prevent attacking self
+        if (attacker.equals(target)) {
+            return;
+        }
 
+        if (attacker instanceof Minion minion) {
+            minion.setInDefensiveStance(false);
+            minion.setDefensePosition(null);
+            log.info("Minion {} defensive stance disabled", attackerStringId);
+        }
+
+        AttackContext attackContext = attackContextFactory.createAttackContext(attacker, target);
 
         attackService.setAttack(attackContext);
-        log.info("Attack context set for entity: {}", entityStringId);
+
+        log.info("Attack context set for entity: {}", attackerStringId);
     }
-} 
+}

@@ -8,13 +8,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class TroopAttackStrategy implements AttackStrategy {
+public class MinionAttackStrategy implements AttackStrategy {
 
     @Override
     public boolean performAttack(AttackContext ctx) {
         // target is a independent entity, like gold mine
         if (ctx.getTarget().getOwnerSlot() == null) {
-            return false; // troop does not attack independent entities
+            return false; // minion does not attack independent entities
         }
 
     

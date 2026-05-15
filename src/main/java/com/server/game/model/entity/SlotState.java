@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SlotState {
-    final Short slot;
+    final Short slotNumber;
 
     final GameState gameState;
 
@@ -35,30 +35,33 @@ public class SlotState {
 
     Burg burg;
 
-    @Getter @Setter
-    private boolean eliminated = false;
+    // boolean eliminated = false;
 
     @Delegate
     final GoldComponent goldComponent;
 
-    final Set<Troop> troops;
+    final Set<Minion> minions;
 
-    public SlotState(GameState gameState, Short slot, Champion champion, Set<Tower> towers, Burg bug, Integer initialGold) {
+    public SlotState(GameState gameState, Short slotNumber, Champion champion, Set<Tower> towers, Burg burg, Integer initialGold) {
         this.gameState = gameState;
-        this.slot = slot;
+        this.slotNumber = slotNumber;
         this.champion = champion;
         this.towers = (towers != null) ? towers : new HashSet<>();
-        this.burg = bug;
+        this.burg = burg;
         this.goldComponent = new GoldComponent(initialGold);
-        this.troops = new HashSet<>();
+        this.minions = new HashSet<>();
     }
 
-    public void addTroop(Troop troop) {
-        if (troop == null) {
-            log.error(">>> [SlotState] Cannot add null troop");
+    public boolean isEliminated() {
+        return !this.getBurg().isAlive();
+    }
+
+    public void addMinion(Minion minion) {
+        if (minion == null) {
+            log.error(">>> [SlotState] Cannot add null minion");
             return;
         }
-        this.troops.add(troop);
+        this.minions.add(minion);
     }
 
     public boolean isChampionAlive(){
@@ -93,26 +96,26 @@ public class SlotState {
         this.setCurrentHP(this.getMaxHP());
     }
 
-    public void addTroopInstance(Troop troopInstance){
-        this.troops.add(troopInstance);
+    public void addMinionInstance(Minion minionInstance){
+        this.minions.add(minionInstance);
     }
 
-    public int getTroopCount(){ return this.troops.size(); }
+    public int getMinionCount(){ return this.minions.size(); }
 
     @Override
     public boolean equals(Object other) {
         if (other == null) { return false; }
         if (!(other instanceof SlotState otherSlotState)) { return false; }
         if (this == other) { return true; }
-        return this.slot == otherSlotState.slot;
+        return this.slotNumber == otherSlotState.slotNumber;
     }
 
     /**
      * Get player status summary
      */
     public String getStatusSummary() {
-        return String.format("Slot %d (%s): HP %d/%d, Gold: %d, Troops: %d, Alive: %s",
-                slot, champion.getChampionEnum(), getCurrentHP(), getMaxHP(), getCurrentGold(), getTroopCount(),
+        return String.format("Slot %d (%s): HP %d/%d, Gold: %d, Minions: %d, Alive: %s",
+                slotNumber, champion.getChampionEnum(), getCurrentHP(), getMaxHP(), getCurrentGold(), getMinionCount(),
                 champion.isAlive());
     }
 }

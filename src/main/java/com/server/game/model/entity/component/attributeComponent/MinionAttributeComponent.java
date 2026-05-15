@@ -4,13 +4,13 @@ package com.server.game.model.entity.component.attributeComponent;
 import lombok.Getter;
 
 @Getter
-public class TroopAttributeComponent extends AttributeComponent {
+public class MinionAttributeComponent extends AttributeComponent {
     protected float detectionRange;
     protected Integer healingPower; // Optional for healers
     protected Float healingRange; // Optional for healers
     protected int cost;
 
-    public TroopAttributeComponent(
+    public MinionAttributeComponent(
         int defense, 
         float detectionRange, 
         Integer healingPower, 

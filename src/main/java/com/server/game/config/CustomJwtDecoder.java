@@ -41,7 +41,7 @@ public class CustomJwtDecoder implements JwtDecoder {
             throw new JwtException("Token validation failed: " + e.getMessage());
         }
 
-        System.out.println(">>> HEREEEE");
+        // System.out.println(">>> HEREEEE");
 
         if (nimbusJwtDecoder == null) {
             synchronized (this) {

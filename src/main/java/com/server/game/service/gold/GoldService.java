@@ -7,7 +7,7 @@ import com.server.game.factory.GoldMineFactory;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.GoldMine;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.GameMap.Playground;
+import com.server.game.resource.modelInfo.GameMapInfo.Playground;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.util.Util;
 

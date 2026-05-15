@@ -1,4 +1,4 @@
-package com.server.game.resource.service;
+package com.server.game.service.gameMap;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,9 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
-import com.server.game.resource.model.GameMap;
-import com.server.game.resource.repository.GameMapRepository;
 import com.server.game.model.map.component.Vector2;
+import com.server.game.repository.mongo.GameMapRepository;
+import com.server.game.resource.modelInfo.GameMapInfo;
 
 import lombok.AccessLevel;
 
@@ -23,7 +23,7 @@ public class GameMapService {
 
     GameMapRepository gameMapRepository;
 
-    public GameMap getGameMapById(short id) {
+    public GameMapInfo getGameMapById(short id) {
         return gameMapRepository.findById(id).orElseGet(() -> {
             log.info("GameMap with id " + id + " not found.");
             return null;
@@ -32,7 +32,7 @@ public class GameMapService {
 
 
     public Vector2 getSpawnPosition(Short gameMapId, short slot) {
-        GameMap gameMap = getGameMapById(gameMapId);
+        GameMapInfo gameMap = getGameMapById(gameMapId);
         if (gameMap == null) {
             log.info("GameMap with id " + gameMapId + " not found.");
             return null;
@@ -42,7 +42,7 @@ public class GameMapService {
 
 
     public Float getInitialRotate(Short gameMapId, short slot) {
-        GameMap gameMap = getGameMapById(gameMapId);
+        GameMapInfo gameMap = getGameMapById(gameMapId);
         if (gameMap == null) {
             log.info("GameMap with id " + gameMapId + " not found.");
             return null;

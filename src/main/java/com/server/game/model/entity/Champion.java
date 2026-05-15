@@ -14,7 +14,7 @@ import com.server.game.model.entity.component.skillComponent.SkillComponent;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.model.entity.context.CastSkillContext;
 import com.server.game.model.entity.entityIface.SkillReceivable;
-import com.server.game.resource.model.ChampionDB;
+import com.server.game.resource.modelInfo.ChampionInfo;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.util.ChampionEnum;
 
@@ -48,11 +48,9 @@ public final class Champion extends DependentEntity implements SkillReceivable {
     final AttackComponent attackComponent;
 
 
-    public Champion(ChampionDB championDB, SlotState ownerSlot, GameState gameState,
-        SkillFactory skillFactory) {
+    public Champion(ChampionInfo championDB, SlotState ownerSlot, SkillFactory skillFactory) {
 
-        super("champion_" + UUID.randomUUID().toString(),
-            gameState, ownerSlot);
+        super("champion_" + UUID.randomUUID().toString(), ownerSlot);
 
         this.championEnum = ChampionEnum.fromShort(championDB.getId());
         this.name = championDB.getName();

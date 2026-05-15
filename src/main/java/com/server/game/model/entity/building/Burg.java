@@ -11,7 +11,7 @@ import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.attackStrategy.BurgAttackStrategy;
 import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.context.AttackContext;
-import com.server.game.resource.model.SlotInfo.BurgDB;
+import com.server.game.resource.modelInfo.SlotInfo.BurgDB;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -27,7 +27,7 @@ public final class Burg extends Building {
     final AttackComponent attackComponent;
 
     public Burg(SlotState ownerSlot, GameState gameState, BurgDB burgDB) {
-        super("burg_" + ownerSlot.getSlot() + UUID.randomUUID().toString(),
+        super("burg_" + ownerSlot.getSlotNumber() + UUID.randomUUID().toString(),
         ownerSlot, gameState,
         gameState.getGameMap().getBurgHP(), 
         gameState.getGameMap().getBurgDefense(), 
@@ -101,7 +101,7 @@ public final class Burg extends Building {
             this.getGameId(), removedEntityIds, 
             killer.getAttackContext().getTimestamp());
         
-        ownerSlot.setEliminated(true);
+        // ownerSlot.setEliminated(true);
 
         for(Entity entity : entitiesToRemove) {
             gameState.removeEntity(entity);
@@ -114,8 +114,8 @@ public final class Burg extends Building {
         if (gameState.isGameOver()) {
             this.getGameStateService().sendGameOver(
                 this.getGameId(), 
-                gameState.getWinnerSlot().getSlot(),
-                ownerSlot.getSlot(), 
+                gameState.getWinnerSlot().getSlotNumber(),
+                ownerSlot.getSlotNumber(), 
                 killer.getAttackContext().getTimestamp()
             );
         }

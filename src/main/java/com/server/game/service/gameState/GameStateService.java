@@ -71,6 +71,40 @@ public class GameStateService {
         return gameCoordinator.getAllActiveGameStates();
     }
 
+    public SlotState getSlotStateFromSlotNumber(GameState gameState, short slotNumber) {
+        if (gameState == null) {
+            log.warn("Game state is null");
+            return null;
+        }
+        SlotState slotState = gameState.getSlotState(slotNumber);
+        if (slotState == null) {
+            log.warn("Slot state not found for gameId: {}, slot: {}", gameState.getGameId(), slotNumber);
+            return null;
+        }
+        return slotState;
+    }
+
+    public List<SlotState> getAllSlotStates(GameState gameState) {
+        if (gameState == null) {
+            log.warn("Game state is null");
+            return null;
+        }
+        return gameState.getAllSlotStates();
+    }
+
+    public float getSpawnRotate(SlotState slotState) {
+        if (slotState == null) {
+            log.warn("Slot state is null");
+            return 0f; // Default rotation
+        }
+        GameState gameState = slotState.getGameState();
+        if (gameState == null) {
+            log.warn("Game state is null for slot: {}", slotState.getSlotNumber());
+            return 0f; // Default rotation
+        }
+        return gameState.getSpawnRotate(slotState);
+    }
+
     public void addEntityTo(GameState gameState, Entity entity) {
         if (gameState == null || entity == null) {
             log.warn("Invalid parameters for adding entity to game state");
@@ -209,7 +243,7 @@ public class GameStateService {
     public void scheduleChampionRespawn(SlotState slotState, short respawnTime) {
 
         String gameId = slotState.getGameState().getGameId();
-        short slot = slotState.getSlot();
+        short slot = slotState.getSlotNumber();
 
         // Create a unique key for this respawn
         String respawnKey = gameId + ":" + slot;
@@ -263,7 +297,7 @@ public class GameStateService {
         Vector2 initialPosition = gameState.getSpawnPosition(slot);
         Champion champion = gameState.getChampionBySlot(slot);
         int maxHealth = champion.getMaxHP();
-        float rotateAngle = gameState.getSpawnRotate(slotState);
+        float rotateAngle = this.getSpawnRotate(slotState);
 
         // Reset the state
         slotState.setChampionRevive();
@@ -346,7 +380,7 @@ public class GameStateService {
             stats.append(String.format("  Slot %d (%s): HP %d/%d, Gold: %d, Troops: %d, Alive: %s%n",
                     entry.getKey(), slotState.getChampion().getChampionEnum(),
                     slotState.getCurrentHP(), slotState.getMaxHP(),
-                    slotState.getCurrentGold(), slotState.getTroopCount(), slotState.isChampionAlive()));
+                    slotState.getCurrentGold(), slotState.getMinionCount(), slotState.isChampionAlive()));
         }
         
         return stats.toString();
@@ -550,7 +584,7 @@ public class GameStateService {
         
         // Send the update message to all players in the game
         this.playgroundMessageHandler.sendInPlaygroundUpdateMessage(
-            gameState.getGameId(), slot.getSlot(), isInPlayground);
+            gameState.getGameId(), slot.getSlotNumber(), isInPlayground);
     }
 
     public void sendAttackAnimation(AttackContext ctx) {
@@ -572,7 +606,7 @@ public class GameStateService {
     public void sendGoldMineSpawnMessage(String gameId, String goldMineId, 
         boolean isSmallGoldMine, Vector2 position, int initHP) {
         
-            this.playgroundMessageHandler
+        this.playgroundMessageHandler
             .sendGoldMineSpawnMessage(gameId, goldMineId, isSmallGoldMine, position, initHP);
     }
     

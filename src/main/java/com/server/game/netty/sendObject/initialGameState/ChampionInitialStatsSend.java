@@ -13,7 +13,7 @@ import com.server.game.netty.pipelineComponent.outboundSendMessage.SendTarget;
 import com.server.game.netty.pipelineComponent.outboundSendMessage.sendTargetType.UnicastTarget;
 import com.server.game.netty.tlv.interf4ce.TLVEncodable;
 import com.server.game.netty.tlv.messageEnum.SendMessageType;
-import com.server.game.resource.model.TroopDB;
+import com.server.game.resource.modelInfo.MinionInfo;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,7 +37,7 @@ public class ChampionInitialStatsSend implements TLVEncodable {
     Set<TroopCostData> troopCosts;
 
 
-    public ChampionInitialStatsSend(Champion champion, Integer initGold, Set<TroopDB> troopDBs) {
+    public ChampionInitialStatsSend(Champion champion, Integer initGold, Set<MinionInfo> troopDBs) {
         this.defense = champion.getDefense();
         this.attack = champion.getDamage();
         this.moveSpeed = champion.getMoveSpeed();

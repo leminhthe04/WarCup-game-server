@@ -15,7 +15,7 @@ import com.server.game.service.defense.DefensiveStanceService;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.gold.GoldService;
 import com.server.game.service.move.MoveService;
-import com.server.game.service.troop.TroopManager;
+import com.server.game.service.minion.MinionService;
 
 import io.netty.channel.Channel;
 import lombok.AccessLevel;
@@ -36,8 +36,8 @@ public class GameLogicScheduler {
     GameStateService gameStateService;
     DefensiveStanceService defensiveStanceService;
     DefenseService defenseService;
-    TroopManager troopManager;
-    
+    MinionService troopManager;
+
     /**
      * Main game logic loop - runs every 33ms (~30 FPS)
      * Handles movement updates and combat logic
@@ -53,8 +53,8 @@ public class GameLogicScheduler {
                 // Process attack targeting and continuous combat
                 attackService.processAttacks(gameState);
 
-                // Check for troop deaths and handle cleanup
-                troopManager.checkAndHandleAllTroopDeaths(gameState);
+                // Check for minion deaths and handle cleanup
+                troopManager.checkAndHandleAllMinionDeaths(gameState);
 
                 // Update movement positions
                 moveService.updatePositions(gameState);
@@ -68,7 +68,6 @@ public class GameLogicScheduler {
             }
         }
     }
-
 
     /**
      * Handles gold auto-generation when slot is in playground,
@@ -86,7 +85,6 @@ public class GameLogicScheduler {
         }
     }
 
-    
     /**
      * Slower game logic loop - runs every 200ms (5 FPS)
      * Handles less critical game systems
@@ -103,13 +101,13 @@ public class GameLogicScheduler {
                 // - Game statistics updates
                 // - Health regeneration
                 // - Status effect updates
-                
-            } catch (Exception e) {
-                log.error("Error in slow game logic loop for game: {}", gameState.getGameId(), e);
+
+            } catch (Throwable t) {
+                log.error("Error in slow game logic loop", t);
             }
         }
     }
-    
+
     /**
      * Very slow game logic loop - runs every 1000ms (1 FPS)
      * Handles background game systems
@@ -123,7 +121,7 @@ public class GameLogicScheduler {
                 // - Performance metrics collection
                 // - Anti-cheat validation
                 // - Database persistence
-                
+
             } catch (Exception e) {
                 log.error("Error in background game logic loop for game: {}", gameState.getGameId(), e);
             }
@@ -132,6 +130,7 @@ public class GameLogicScheduler {
 
     /**
      * Heartbeat method to keep the game logic scheduler alive
+     * 
      * @return
      */
     @Scheduled(fixedDelay = 30000) // 30 seconds
@@ -142,12 +141,12 @@ public class GameLogicScheduler {
 
             if (channel.isActive()) {
                 channel.writeAndFlush(new HeartbeatMessage())
-                    .addListener(future -> {
-                        if (!future.isSuccess()) {
-                            log.info(">>> Heartbeat failed for user " + userId + ". Cleaning up channel.");
-                            ChannelManager.unregister(channel);
-                        }
-                });
+                        .addListener(future -> {
+                            if (!future.isSuccess()) {
+                                log.info(">>> Heartbeat failed for user " + userId + ". Cleaning up channel.");
+                                ChannelManager.unregister(channel);
+                            }
+                        });
             } else {
                 log.info(">>> Inactive channel for user " + userId + ". Removing from manager.");
                 ChannelManager.unregister(channel);

@@ -10,7 +10,7 @@ import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.GameMapGrid;
+import com.server.game.resource.modelInfo.GameMapGridInfo;
 import com.server.game.util.ThetaStarPathfinder;
 
 import jakarta.validation.constraints.NotNull;
@@ -73,7 +73,7 @@ public class MoveContext {
     public List<GridCell> findPath() {
         GridCell startCell = gameState.toGridCell(mover.getCurrentPosition());
         GridCell targetCell = gameState.toGridCell(targetPoint);
-        GameMapGrid gameMapGrid = gameState.getGameMapGrid();
+        GameMapGridInfo gameMapGrid = gameState.getGameMapGrid();
         // log.info("Setting move target for entity {}: from {} to {}", mover.getStringId(), mover.getCurrentPosition(), targetPoint);
         // log.info("Calculating path for entity {} from cell {} to cell {}", mover.getStringId(), startCell, targetCell);
 

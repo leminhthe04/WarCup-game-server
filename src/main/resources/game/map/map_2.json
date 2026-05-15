@@ -2,7 +2,7 @@
   "id": 2,
   "map_name": "map_2",
 
-  "initial_gold_each_slot": 150,
+  "initial_gold_each_slot": 15000,
   "gold_generated_per_second": 2,
 
   "small_gold_mine_initial_hp": 5,

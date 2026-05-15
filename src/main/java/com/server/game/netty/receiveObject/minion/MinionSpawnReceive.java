@@ -1,4 +1,4 @@
-package com.server.game.netty.receiveObject.troop;
+package com.server.game.netty.receiveObject.minion;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -19,21 +19,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ReceiveType(ReceiveMessageType.TROOP_SPAWN_RECEIVE)
 @Component
-public class TroopSpawnReceive implements TLVDecodable {
-    short troopId;
-    short ownerSlot;
-    boolean isAttack;
-    long timestamp;
-
+public class MinionSpawnReceive implements TLVDecodable {
+    short minionId;
+    
     @Override
     public void decode(byte[] value) {
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(value);
             DataInputStream dis = new DataInputStream(bais);
-            this.troopId = dis.readShort();
-            this.ownerSlot = dis.readShort();
-            this.isAttack = dis.readBoolean();
-            this.timestamp = dis.readLong();
+            this.minionId = dis.readShort();
         } catch (Exception e) {
             throw new  RuntimeException("Cannot decode " + this.getClass().getSimpleName(), e);
         }

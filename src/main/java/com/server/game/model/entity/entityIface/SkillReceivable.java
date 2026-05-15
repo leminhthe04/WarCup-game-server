@@ -18,7 +18,7 @@ public interface SkillReceivable {
             throw new IllegalArgumentException("Target must not be null");
         }
 
-        @SuppressWarnings("null")
+        // @SuppressWarnings("null")
         Integer myDefense = ctx.getTarget().getDefense();
         if (myDefense == null || myDefense <= 0) {
             throw new IllegalArgumentException("Defense must be a positive value");

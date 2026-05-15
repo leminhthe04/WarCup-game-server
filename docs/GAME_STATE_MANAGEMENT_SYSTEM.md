@@ -28,7 +28,7 @@ The main service for managing game state across all active games. It provides:
 
 Represents the complete state of a single player including:
 - **Basic Stats**: Health (current/max), slot, champion ID
-- **Extended Stats**: Gold, troop count, level, experience
+- **Extended Stats**: Gold, minion count, level, experience
 - **Combat States**: Skill cooldowns, invulnerability, armor, magic resistance
 - **Tracking**: Last damage time, last action time, regeneration status
 
@@ -40,7 +40,7 @@ private final int maxHP;
 
 // Economy system
 private int gold = 0;
-private int troopCount = 0;
+private int minionCount = 0;
 
 // Progression system
 private int level = 1;

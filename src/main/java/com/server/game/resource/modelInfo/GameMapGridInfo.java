@@ -1,4 +1,4 @@
-package com.server.game.resource.model;
+package com.server.game.resource.modelInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,7 +16,7 @@ import lombok.AccessLevel;
 @AllArgsConstructor
 @JsonDeserialize(using = GameMapGridDeserializer.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GameMapGrid {
+public class GameMapGridInfo {
     short id;
     String name;
     Vector2 cornerA;

@@ -16,8 +16,8 @@ import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.building.Burg;
 import com.server.game.model.entity.building.Tower;
-import com.server.game.resource.model.SlotInfo.BurgDB;
-import com.server.game.resource.model.SlotInfo.TowerDB;
+import com.server.game.resource.modelInfo.SlotInfo.BurgDB;
+import com.server.game.resource.modelInfo.SlotInfo.TowerDB;
 
 import lombok.AccessLevel;
 

@@ -9,7 +9,7 @@ import com.server.game.factory.AttackContextFactory;
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
-import com.server.game.model.entity.Troop;
+import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.building.Burg;
 import com.server.game.model.entity.building.Tower;
 import com.server.game.service.attack.AttackService;
@@ -18,7 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Service responsible for handling the defense mechanisms of buildings like Towers and Burgs.
+ * Service responsible for handling the defense mechanisms of buildings like
+ * Towers and Burgs.
  */
 @Slf4j
 @Service
@@ -31,17 +32,24 @@ public class DefenseService {
      * Update the defense for all defensive structures (Towers and Burgs)
      */
     public void updateDefenses(GameState gameState) {
-        // Process tower defenses
-        gameState.getEntities().stream()
-            .filter(entity -> entity instanceof Tower)
-            .map(entity -> (Tower) entity)
-            .forEach(tower -> processTowerDefense(tower, gameState));
-        
-        // Process burg defenses
-        gameState.getEntities().stream()
-            .filter(entity -> entity instanceof Burg)
-            .map(entity -> (Burg) entity)
-            .forEach(burg -> processBurgDefense(burg, gameState));
+        try {
+            // Process tower defenses
+            gameState.getEntities().stream()
+                    .filter(entity -> entity instanceof Tower)
+                    .map(entity -> (Tower) entity)
+                    .forEach(tower -> processTowerDefense(tower, gameState));
+
+            // Process burg defenses
+            gameState.getEntities().stream()
+                    .filter(entity -> entity instanceof Burg)
+                    .map(entity -> (Burg) entity)
+                    .forEach(burg -> processBurgDefense(burg, gameState));
+        } catch (Throwable t) {
+            try {
+                log.error("Error in updateDefenses", t);
+            } catch (Throwable ignored) {
+            }
+        }
     }
 
     /**
@@ -68,9 +76,7 @@ public class DefenseService {
         findPriorityTargetInRange(tower, gameState).ifPresent(enemy -> {
             log.trace("Tower {} found new target: {}", tower.getStringId(), enemy.getStringId());
 
-            attackService.setAttack(attackContextFactory.createAttackContext(
-                gameState.getGameId(), tower.getStringId(), enemy.getStringId(), gameState.getCurrentTick()
-            ));
+            attackService.setAttack(attackContextFactory.createAttackContext(tower, enemy));
         });
     }
 
@@ -98,20 +104,18 @@ public class DefenseService {
         findPriorityTargetInRange(burg, gameState).ifPresent(enemy -> {
             log.trace("Burg {} found new target: {}", burg.getStringId(), enemy.getStringId());
 
-            attackService.setAttack(attackContextFactory.createAttackContext(
-                gameState.getGameId(), burg.getStringId(), enemy.getStringId(), gameState.getCurrentTick()
-            ));
+            attackService.setAttack(attackContextFactory.createAttackContext(burg, enemy));
         });
     }
 
     private Optional<Entity> findPriorityTargetInRange(Tower tower, GameState gameState) {
         return findPriorityTargetInRange(tower, tower.getAttackComponent().getAttackRange(), gameState);
     }
-    
+
     private Optional<Entity> findPriorityTargetInRange(Burg burg, GameState gameState) {
         return findPriorityTargetInRange(burg, burg.getAttackComponent().getAttackRange(), gameState);
     }
-    
+
     /**
      * Find the highest priority target in range for a defensive entity
      * Priority order: Troops first, then Champions
@@ -119,12 +123,12 @@ public class DefenseService {
     private Optional<Entity> findPriorityTargetInRange(Entity defender, float attackRange, GameState gameState) {
         // First, look for troops (highest priority)
         Optional<Entity> troopTarget = gameState.getEntities().stream()
-            .filter(Entity::isAlive)
-            .filter(e -> e.getOwnerSlot() != null)
-            .filter(e -> e.getOwnerSlot().getSlot() != defender.getOwnerSlot().getSlot()) // Is an enemy
-            .filter(e -> e instanceof Troop)
-            .filter(e -> defender.distanceTo(e) <= attackRange)
-            .min(Comparator.comparing(e -> defender.distanceTo(e)));
+                .filter(Entity::isAlive)
+                .filter(e -> e.getOwnerSlot() != null)
+                .filter(e -> e.getOwnerSlot().getSlotNumber() != defender.getOwnerSlot().getSlotNumber()) // Is an enemy
+                .filter(e -> e instanceof Minion)
+                .filter(e -> defender.distanceTo(e) <= attackRange)
+                .min(Comparator.comparing(e -> defender.distanceTo(e)));
 
         if (troopTarget.isPresent()) {
             return troopTarget;
@@ -132,11 +136,11 @@ public class DefenseService {
 
         // If no troops found, look for champions
         return gameState.getEntities().stream()
-            .filter(Entity::isAlive)
-            .filter(e -> e.getOwnerSlot() != null)
-            .filter(e -> e.getOwnerSlot().getSlot() != defender.getOwnerSlot().getSlot()) // Is an enemy
-            .filter(e -> e instanceof Champion)
-            .filter(e -> defender.distanceTo(e) <= attackRange)
-            .min(Comparator.comparing(e -> defender.distanceTo(e)));
+                .filter(Entity::isAlive)
+                .filter(e -> e.getOwnerSlot() != null)
+                .filter(e -> e.getOwnerSlot().getSlotNumber() != defender.getOwnerSlot().getSlotNumber()) // Is an enemy
+                .filter(e -> e instanceof Champion)
+                .filter(e -> defender.distanceTo(e) <= attackRange)
+                .min(Comparator.comparing(e -> defender.distanceTo(e)));
     }
 }

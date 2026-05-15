@@ -1,16 +1,16 @@
 package com.server.game.model.entity;
 
-import com.server.game.model.entity.attackStrategy.TroopAttackStrategy;
+import com.server.game.model.entity.attackStrategy.MinionAttackStrategy;
 import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.component.HealthComponent;
 import com.server.game.model.entity.component.MovingComponent;
-import com.server.game.model.entity.component.attributeComponent.TroopAttributeComponent;
+import com.server.game.model.entity.component.attributeComponent.MinionAttributeComponent;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.model.entity.context.CastSkillContext;
 import com.server.game.model.entity.entityIface.SkillReceivable;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.TroopDB;
-import com.server.game.util.TroopEnum;
+import com.server.game.resource.modelInfo.MinionInfo;
+import com.server.game.util.MinionEnum;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,12 +25,12 @@ import java.util.UUID;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Troop extends DependentEntity implements SkillReceivable {
+public class Minion extends DependentEntity implements SkillReceivable {
 
-    final TroopEnum troopEnum;
+    final MinionEnum minionEnum;
 
     @Delegate
-    final TroopAttributeComponent attributeComponent;
+    final MinionAttributeComponent attributeComponent;
     @Delegate
     final MovingComponent movingComponent;
     @Delegate
@@ -43,13 +43,12 @@ public class Troop extends DependentEntity implements SkillReceivable {
     boolean inDefensiveStance = true;
     Entity defensiveTarget = null;
 
-    public Troop(TroopDB troopDB, GameState gameState, SlotState ownerSlot) {
-        super("troop_" + UUID.randomUUID().toString(),
-            gameState, ownerSlot);
+    public Minion(MinionInfo troopDB, SlotState ownerSlot) {
+        super("minion_" + UUID.randomUUID().toString(), ownerSlot);
 
-        this.troopEnum = TroopEnum.fromShort(troopDB.getId());
+        this.minionEnum = MinionEnum.fromShort(troopDB.getId());
 
-        this.attributeComponent = new TroopAttributeComponent(
+        this.attributeComponent = new MinionAttributeComponent(
             troopDB.getStats().getDefense(),
             troopDB.getStats().getDetectionRange(),
             troopDB.getStats().getHealingPower(),
@@ -59,7 +58,7 @@ public class Troop extends DependentEntity implements SkillReceivable {
 
         this.movingComponent = new MovingComponent(
             this,
-            gameState.getSpawnPosition(ownerSlot),
+            this.gameState.getSpawnPosition(ownerSlot),
             troopDB.getStats().getMoveSpeed()
         );
 
@@ -71,20 +70,20 @@ public class Troop extends DependentEntity implements SkillReceivable {
             troopDB.getStats().getAttack(),
             troopDB.getStats().getAttackSpeed(),
             troopDB.getStats().getAttackRange(),
-            new TroopAttackStrategy()
+            new MinionAttackStrategy()
         );
 
         this.defenseRange = this.attributeComponent.getDetectionRange() * 1.5f;
 
         this.addAllComponents();
 
-        log.debug("Created troop instance {} of type {} for player {} of gameid={}, at position {}",
-            stringId, troopEnum, ownerSlot, gameState.getGameId(), this.getCurrentPosition());
+        log.debug("Created minion instance {} of type {} for player {} of gameid={}, at position {}",
+            stringId, minionEnum, ownerSlot, gameState.getGameId(), this.getCurrentPosition());
     }
 
     @Override
     protected void addAllComponents() {
-        this.addComponent(TroopAttributeComponent.class, attributeComponent);
+        this.addComponent(MinionAttributeComponent.class, attributeComponent);
         this.addComponent(MovingComponent.class, movingComponent);
         this.addComponent(HealthComponent.class, healthComponent);
         this.addComponent(AttackComponent.class, attackComponent);
@@ -98,9 +97,9 @@ public class Troop extends DependentEntity implements SkillReceivable {
 
     @Override
     public void afterUpdatePosition() {
-        // Check if troop is in defensive stance and has moved outside defense range
+        // Check if minion is in defensive stance and has moved outside defense range
         if (inDefensiveStance && defensePosition != null && !isWithinOwnDefenseRange()) {
-            // If troop has no target or target is no longer valid, return to defense position
+            // If minion has no target or target is no longer valid, return to defense position
             if (defensiveTarget == null || !defensiveTarget.isAlive() || !isWithinDefenseRange(defensiveTarget)) {
                 // Clear any current attack and return to defense position
                 this.attackComponent.setAttackContext(null);
@@ -129,7 +128,7 @@ public class Troop extends DependentEntity implements SkillReceivable {
     }
 
     /**
-     * Checks if a target is within the troop's detection range (use detection range for consistency)
+     * Checks if a target is within the minion's detection range (use detection range for consistency)
      */
     public boolean isWithinDefenseRange(Entity target) {
         if (target == null || defensePosition == null) {
@@ -142,7 +141,7 @@ public class Troop extends DependentEntity implements SkillReceivable {
     }
 
     /**
-     * Checks if the troop itself is within its defense range (circle around defense position).
+     * Checks if the minion itself is within its defense range (circle around defense position).
      */
     public boolean isWithinOwnDefenseRange() {
         if (defensePosition == null) {
@@ -152,7 +151,7 @@ public class Troop extends DependentEntity implements SkillReceivable {
     }
 
     /**
-     * Checks if the troop has any active manual commands (move or attack contexts)
+     * Checks if the minion has any active manual commands (move or attack contexts)
      */
     public boolean hasActiveManualCommands() {
         // Only consider it manual if it's not a defensive action
@@ -182,7 +181,7 @@ public class Troop extends DependentEntity implements SkillReceivable {
         ctx.addExtraData("actualDamage", actualDamage);
         ctx.getGameStateService().sendHealthUpdate(ctx.getGameId(), ctx.getTarget(), ctx.getActualDamage(), System.currentTimeMillis());
 
-        // Check if troop died and handle death logic
+        // Check if minion died and handle death logic
         if (!this.isAlive()) {
             this.handleDeath(ctx.getAttacker());
         }
@@ -206,7 +205,7 @@ public class Troop extends DependentEntity implements SkillReceivable {
         log.debug("Troop {} received skill damage: {}, current HP: {}", 
                 stringId, actualDamage, this.getCurrentHP());
 
-        // Check if troop died and handle death logic
+        // Check if minion died and handle death logic
         if (!this.isAlive()) {
             this.handleDeath(ctx.getCaster());
         }

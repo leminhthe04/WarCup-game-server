@@ -1,4 +1,4 @@
-package com.server.game.resource.model;
+package com.server.game.resource.modelInfo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,8 +17,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.resource.deserializer.PlaygroundDeserializer;
-import com.server.game.resource.model.SlotInfo.BurgDB;
-import com.server.game.resource.model.SlotInfo.TowerDB;
+import com.server.game.resource.modelInfo.SlotInfo.BurgDB;
+import com.server.game.resource.modelInfo.SlotInfo.TowerDB;
 
 import lombok.AccessLevel;
 
@@ -26,7 +26,7 @@ import lombok.AccessLevel;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class GameMap {
+public class GameMapInfo {
     short id;
     String name;
     Integer initialGoldEachSlot;
@@ -62,7 +62,7 @@ public class GameMap {
 
 
     @JsonCreator
-    public GameMap(
+    public GameMapInfo(
         @JsonProperty("id") short id,
         @JsonProperty("map_name") String name,
 

@@ -6,8 +6,10 @@ services:
       - "8080:8080" # Spring HTTP server
       - "8386:8386" # WebSocket server
     depends_on:
-      - mongo
-      - redis
+      mongo:
+        condition: service_healthy   # <--- Đợi Mongo healthy mới chạy
+      redis:
+        condition: service_started
     environment:
       - TZ=Asia/Ho_Chi_Minh
     env_file:        # 
@@ -19,6 +21,11 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:                     # <--- Thêm bộ kiểm tra sức khỏe
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
       
 
   redis:

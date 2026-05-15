@@ -1,4 +1,4 @@
-package com.server.game.resource.model;
+package com.server.game.resource.modelInfo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TroopDB {
+public class MinionInfo {
 
     Short id;
     String name;
@@ -110,7 +110,7 @@ public class TroopDB {
         if (stats != null) {
             return stats.getHp();
         }
-        log.info("Initial HP not found for troop " + id);
+        log.info("Initial HP not found for minion " + id);
         return null;
     }
 

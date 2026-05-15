@@ -6,7 +6,7 @@ import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.context.MoveContext;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
-import com.server.game.resource.model.GameMap.Playground;
+import com.server.game.resource.modelInfo.GameMapInfo.Playground;
 import com.server.game.util.Util;
 
 import lombok.AccessLevel;
