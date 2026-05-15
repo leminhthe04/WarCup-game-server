@@ -1,6 +1,5 @@
 package com.server.game.model.entity.component;
 
-
 import org.springframework.lang.Nullable;
 
 import com.server.game.model.entity.Entity;
@@ -28,9 +27,8 @@ public class AttackComponent {
 
     AttackContext attackContext = null;
 
-
-    public AttackComponent(Entity owner, int damage, float attackSpeed, float attackRange, 
-        AttackStrategy strategy) {
+    public AttackComponent(Entity owner, int damage, float attackSpeed, float attackRange,
+            AttackStrategy strategy) {
 
         this.owner = owner;
         this.strategy = strategy;
@@ -47,7 +45,7 @@ public class AttackComponent {
             this.attackContext = null;
             return true;
         }
-        
+
         if (this.owner.isCastingDurationSkill() && !this.owner.canPerformSkillWhileAttacking()) {
             return false;
         }
@@ -85,7 +83,6 @@ public class AttackComponent {
         return inAttackRange(this.attackContext.getTarget());
     }
 
-
     public final boolean performAttack() {
         AttackContext ctx = this.attackContext;
         if (ctx == null) {
@@ -98,17 +95,15 @@ public class AttackComponent {
             throw new IllegalArgumentException("Target cannot be null");
         }
 
-        
         if (!this.inAttackRange()) {
             owner.getGameStateService().setMove(
-                this.owner, ctx.getTarget().getCurrentPosition());
+                    this.owner, ctx.getTarget().getCurrentPosition());
             return false;
         }
 
-        if (!this.inAttackWindow(currentTick)) {  
-            return false;  
+        if (!this.inAttackWindow(currentTick)) {
+            return false;
         }
-
 
         // Stop moving before performing the attack
         owner.getGameStateService().setStopMoving(this.owner, false);
@@ -116,6 +111,7 @@ public class AttackComponent {
         // Use the strategy to perform the attack
         // .performAttack() has handled to do not attack allies
         boolean didAttack = strategy.performAttack(ctx);
+        this.attackContext.setDidPerformAttack(didAttack);
 
         if (ctx.getTarget() == null || !ctx.getTarget().isAlive()) {
             log.info("After performing attack, target is null or dead");
@@ -127,5 +123,17 @@ public class AttackComponent {
         this.nextAttackTick = currentTick + attackDelayTick;
 
         return didAttack;
+    }
+
+    public boolean didPerformAttack() {
+        return this.attackContext != null && this.attackContext.isDidPerformAttack();
+    }
+
+    public Entity getCurrentAttackEntity() {
+        if (this.attackContext == null) {
+            return null;
+        }
+
+        return this.attackContext.getTarget();
     }
 }

@@ -22,6 +22,9 @@ public class AttackContext { // only normal attacks, not skills
     private Entity target; 
     @NotNull
     private long timestamp;
+
+    private boolean didPerformAttack = false;
+
     @NotNull
     private Map<Object, Object> extraData = new HashMap<>(); 
 

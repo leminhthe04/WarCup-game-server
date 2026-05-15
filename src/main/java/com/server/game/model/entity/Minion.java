@@ -1,6 +1,7 @@
 package com.server.game.model.entity;
 
 import com.server.game.model.entity.attackStrategy.MinionAttackStrategy;
+import com.server.game.model.entity.building.Building;
 import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.component.HealthComponent;
 import com.server.game.model.entity.component.MovingComponent;
@@ -11,6 +12,7 @@ import com.server.game.model.entity.entityIface.SkillReceivable;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.resource.modelInfo.MinionInfo;
 import com.server.game.util.MinionEnum;
+import com.server.game.util.NPCPriorityEnum;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -49,36 +51,32 @@ public class Minion extends DependentEntity implements SkillReceivable {
         this.minionEnum = MinionEnum.fromShort(troopDB.getId());
 
         this.attributeComponent = new MinionAttributeComponent(
-            troopDB.getStats().getDefense(),
-            troopDB.getStats().getDetectionRange(),
-            troopDB.getStats().getHealingPower(),
-            troopDB.getStats().getHealingRange(),
-            troopDB.getStats().getCost()
-        );
+                troopDB.getStats().getDefense(),
+                troopDB.getStats().getDetectionRange(),
+                troopDB.getStats().getHealingPower(),
+                troopDB.getStats().getHealingRange(),
+                troopDB.getStats().getCost());
 
         this.movingComponent = new MovingComponent(
-            this,
-            this.gameState.getSpawnPosition(ownerSlot),
-            troopDB.getStats().getMoveSpeed()
-        );
+                this,
+                this.gameState.getSpawnPosition(ownerSlot),
+                troopDB.getStats().getMoveSpeed());
 
         this.healthComponent = new HealthComponent(
-            troopDB.getStats().getHp()
-        );
+                troopDB.getStats().getHp());
         this.attackComponent = new AttackComponent(
-            this,
-            troopDB.getStats().getAttack(),
-            troopDB.getStats().getAttackSpeed(),
-            troopDB.getStats().getAttackRange(),
-            new MinionAttackStrategy()
-        );
+                this,
+                troopDB.getStats().getAttack(),
+                troopDB.getStats().getAttackSpeed(),
+                troopDB.getStats().getAttackRange(),
+                new MinionAttackStrategy());
 
         this.defenseRange = this.attributeComponent.getDetectionRange() * 1.5f;
 
         this.addAllComponents();
 
         log.debug("Created minion instance {} of type {} for player {} of gameid={}, at position {}",
-            stringId, minionEnum, ownerSlot, gameState.getGameId(), this.getCurrentPosition());
+                stringId, minionEnum, ownerSlot, gameState.getGameId(), this.getCurrentPosition());
     }
 
     @Override
@@ -89,7 +87,6 @@ public class Minion extends DependentEntity implements SkillReceivable {
         this.addComponent(AttackComponent.class, attackComponent);
     }
 
-    
     @Override
     public void beforeUpdatePosition() {
         super.beforeUpdatePosition();
@@ -99,25 +96,27 @@ public class Minion extends DependentEntity implements SkillReceivable {
     public void afterUpdatePosition() {
         // Check if minion is in defensive stance and has moved outside defense range
         if (inDefensiveStance && defensePosition != null && !isWithinOwnDefenseRange()) {
-            // If minion has no target or target is no longer valid, return to defense position
+            // If minion has no target or target is no longer valid, return to defense
+            // position
             if (defensiveTarget == null || !defensiveTarget.isAlive() || !isWithinDefenseRange(defensiveTarget)) {
                 // Clear any current attack and return to defense position
                 this.attackComponent.setAttackContext(null);
                 this.defensiveTarget = null;
-                
+
                 // Set movement back to defense position
                 // Note: We need access to MoveService2 to do this properly
                 // This will be handled by DefensiveStanceService in the next tick
-                log.trace("Troop {} is outside defense range. Will return to defense position {} in next tick.", 
-                    stringId, defensePosition);
+                log.trace("Troop {} is outside defense range. Will return to defense position {} in next tick.",
+                        stringId, defensePosition);
             }
         }
-        
+
         super.afterUpdatePosition();
     }
 
     /**
-     * Updates the defense position. This does NOT automatically enable defensive stance.
+     * Updates the defense position. This does NOT automatically enable defensive
+     * stance.
      * Defensive stance should be managed separately based on context availability.
      */
     public void updateDefensePosition(Vector2 newPosition) {
@@ -128,20 +127,23 @@ public class Minion extends DependentEntity implements SkillReceivable {
     }
 
     /**
-     * Checks if a target is within the minion's detection range (use detection range for consistency)
+     * Checks if a target is within the minion's detection range (use detection
+     * range for consistency)
      */
     public boolean isWithinDefenseRange(Entity target) {
         if (target == null || defensePosition == null) {
             return false;
         }
         // Use detection range instead of defense range for consistency
-        // return defensePosition.distance(target.getCurrentPosition()) <= this.getDetectionRange();
+        // return defensePosition.distance(target.getCurrentPosition()) <=
+        // this.getDetectionRange();
         return this.getCurrentPosition().distance(target.getCurrentPosition()) <= this.getDetectionRange();
-    
+
     }
 
     /**
-     * Checks if the minion itself is within its defense range (circle around defense position).
+     * Checks if the minion itself is within its defense range (circle around
+     * defense position).
      */
     public boolean isWithinOwnDefenseRange() {
         if (defensePosition == null) {
@@ -176,10 +178,11 @@ public class Minion extends DependentEntity implements SkillReceivable {
         int actualDamage = (int) this.calculateActualDamage(ctx);
         this.decreaseHP(actualDamage);
         log.debug(stringId + " received attack from " + ctx.getAttacker().getStringId() +
-            " with actual damage: " + actualDamage);
+                " with actual damage: " + actualDamage);
 
         ctx.addExtraData("actualDamage", actualDamage);
-        ctx.getGameStateService().sendHealthUpdate(ctx.getGameId(), ctx.getTarget(), ctx.getActualDamage(), System.currentTimeMillis());
+        ctx.getGameStateService().sendHealthUpdate(ctx.getGameId(), ctx.getTarget(), ctx.getActualDamage(),
+                System.currentTimeMillis());
 
         // Check if minion died and handle death logic
         if (!this.isAlive()) {
@@ -189,20 +192,18 @@ public class Minion extends DependentEntity implements SkillReceivable {
         return true; // Indicate that the attack was received successfully
     }
 
-    
-
     @Override
     public void receiveSkillDamage(CastSkillContext ctx) {
         // Process the skill damage and calculate actual damage
         int actualDamage = (int) this.calculateActualDamage(ctx);
         this.decreaseHP(actualDamage);
-        
+
         // Send health update for the target
         ctx.addActualDamage(actualDamage);
         ctx.getGameStateService().sendHealthUpdate(
-            ctx.getGameId(), this, actualDamage, ctx.getTimestamp());
-        
-        log.debug("Troop {} received skill damage: {}, current HP: {}", 
+                ctx.getGameId(), this, actualDamage, ctx.getTimestamp());
+
+        log.debug("Troop {} received skill damage: {}, current HP: {}",
                 stringId, actualDamage, this.getCurrentHP());
 
         // Check if minion died and handle death logic
@@ -213,10 +214,33 @@ public class Minion extends DependentEntity implements SkillReceivable {
 
     @Override
     protected void handleDeath(Entity killer) {
-        // Note: TroopManager.checkAndHandleAllTroopDeaths() will handle the cleanup in the next game tick
+        // Note: TroopManager.checkAndHandleAllTroopDeaths() will handle the cleanup in
+        // the next game tick
         log.info("Troop {} has died and will be cleaned up in next game tick", this.getStringId());
 
         this.getGameStateService().setStopAttacking(this);
         this.getGameStateService().setStopMoving(this, true);
+    }
+
+    @Override
+    public NPCPriorityEnum getNpcPriorityEnum() {
+        if (!this.didPerformAttack()) {
+            return NPCPriorityEnum.MINION_FREE;
+        }
+
+        Entity currentAttackEntity = this.getCurrentAttackEntity();
+
+        if (currentAttackEntity instanceof Champion) {
+            return NPCPriorityEnum.MINION_ATKG_CHAMPION;
+        }
+        if (currentAttackEntity instanceof Minion) {
+            return NPCPriorityEnum.MINION_ATKG_MINION;
+        }
+        if (currentAttackEntity instanceof Building) {
+            return NPCPriorityEnum.MINION_ATKG_BUILDING;
+        }
+
+        return NPCPriorityEnum.MINION_FREE; // fall back
+
     }
 }

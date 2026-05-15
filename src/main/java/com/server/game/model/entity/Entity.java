@@ -16,6 +16,7 @@ import com.server.game.model.entity.entityIface.Attackable;
 import com.server.game.model.entity.entityIface.HasFixedPosition;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
+import com.server.game.util.NPCPriorityEnum;
 
 import lombok.experimental.Delegate;
 import lombok.extern.slf4j.Slf4j;
@@ -401,6 +402,8 @@ public abstract class Entity implements Attackable {
         log.info("Entity does not have SkillComponent, returning true for canUseSkillWhileMoving.");
         return true; // Default value if no skill component is present
     }
+
+    public abstract NPCPriorityEnum getNpcPriorityEnum();
 
     @Override
     public boolean equals(Object obj) {

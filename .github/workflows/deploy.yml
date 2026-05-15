@@ -2,7 +2,7 @@ name: Deploy Game Server to AWS EC2
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main", "develop", "feat/npc/detection" ]
 
 jobs:
   build-and-deploy:

@@ -7,6 +7,7 @@ import com.server.game.model.entity.context.AttackContext;
 import com.server.game.model.entity.entityIface.HasFixedPosition;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.service.gameState.GameStateService;
+import com.server.game.util.NPCPriorityEnum;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.AccessLevel;
@@ -74,5 +75,11 @@ public final class GoldMine extends Entity implements HasFixedPosition {
         this.getGameState().removeEntity(this);
 
         this.getGameState().decreaseCurrentNumGoldMine();
+    }
+
+    @Override
+    public NPCPriorityEnum getNpcPriorityEnum() {
+        log.warn("NPC shouldn't care about this entity: {}, return prio=null", this.getStringId());
+        return null;
     }
 }

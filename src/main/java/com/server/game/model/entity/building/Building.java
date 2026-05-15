@@ -7,6 +7,7 @@ import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.component.HealthComponent;
 import com.server.game.model.entity.entityIface.HasFixedPosition;
 import com.server.game.model.map.component.Vector2;
+import com.server.game.util.NPCPriorityEnum;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -56,5 +57,10 @@ public abstract class Building extends DependentEntity implements HasFixedPositi
     @Override
     protected void addAllComponents() {
         this.addComponent(HealthComponent.class, this.healthComponent);
+    }
+
+    @Override
+    public NPCPriorityEnum getNpcPriorityEnum() {
+        return NPCPriorityEnum.BUILDING;
     }
 }
