@@ -507,7 +507,7 @@ public class GameStateService {
     public Set<Entity> getEnemiesInScope(GameState gameState, Shape scope, SlotState slotState) {
         Set<Entity> res = this.getEntitiesInScope(gameState, scope);
         for (Entity entity : res) {
-            if (slotState.equals(entity.getOwnerSlot())) {
+            if (entity.getOwnerSlot() == null || slotState.equals(entity.getOwnerSlot())) {
                 res.remove(entity);
             }
         }

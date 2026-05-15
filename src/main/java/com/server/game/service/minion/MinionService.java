@@ -241,6 +241,7 @@ public class MinionService {
         }
     }
 
+
     public void checkStopChasing(GameState gameState) {
         Set<Minion> minions = gameStateService.getAllMinions(gameState);
         minions.forEach(minion -> this.checkStopChasingOf(minion));
@@ -258,6 +259,7 @@ public class MinionService {
 
         // back to standard path after interrupting chasing enemy
         this.setMoveFollowingStandardPath(minion);
+        log.info("Minion ID={} stops chasing", minion.getStringId());
     }
 
     public void updateDetections(GameState gameState) {
@@ -285,10 +287,17 @@ public class MinionService {
             }
         }
 
+        if (highestPrioEntity != null)
+            log.info("Highest prio entity id={}, prio={}", highestPrioEntity.getStringId(), highestPrioEntity.getNpcPriorityEnum());
+
         boolean needUpdatingAttackEnemy = highestPrioEntity != null &&
                 (!minion.isAttacking() || // is not attacking or is attacking but lower prio entity
                         highestPrioEntity.getNpcPriorityEnum().higher(
                                 minion.getCurrentAttackEntity().getNpcPriorityEnum()));
+
+        if (minion.isAttacking()) {
+            log.info("Current minion's target id={}, prio={}", minion.getCurrentAttackEntity().getStringId(), minion.getCurrentAttackEntity().getNpcPriorityEnum());
+        }
 
         if (!needUpdatingAttackEnemy) {
             return;

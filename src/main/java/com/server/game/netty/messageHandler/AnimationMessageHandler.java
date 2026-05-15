@@ -25,7 +25,7 @@ public class AnimationMessageHandler {
             // Get any channel from the game to broadcast the animation
             Channel channel = ChannelManager.getAnyChannelByGameId(ctx.getGameId());
             channel.writeAndFlush(attackAnimation);
-            log.info("Sent AttackAnimationSend: " + attackAnimation);
+            // log.info("Sent AttackAnimationSend: " + attackAnimation);
         } catch (Exception e) {
             log.error("Exception in broadcastAttackerAnimation: " + e.getMessage());
         }

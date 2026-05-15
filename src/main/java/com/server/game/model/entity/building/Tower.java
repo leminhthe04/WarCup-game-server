@@ -10,11 +10,9 @@ import com.server.game.model.entity.context.AttackContext;
 import com.server.game.resource.modelInfo.SlotInfo.TowerDB;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-// @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public final class Tower extends Building {

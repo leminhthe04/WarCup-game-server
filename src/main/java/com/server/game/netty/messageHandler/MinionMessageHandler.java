@@ -180,7 +180,7 @@ public class MinionMessageHandler {
             log.debug("Moved minion {} to spread position {}", minionId, moveToPosition);
         }
 
-        log.info("Processed {} minion positions with collision avoidance for game {}", minionIds.size(), gameId);
+        // log.info("Processed {} minion positions with collision avoidance for game {}", minionIds.size(), gameId);
     }
 
     /**

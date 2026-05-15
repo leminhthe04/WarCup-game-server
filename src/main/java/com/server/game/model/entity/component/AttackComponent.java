@@ -117,7 +117,7 @@ public class AttackComponent {
         // Use the strategy to perform the attack
         // .performAttack() has handled to do not attack allies
         boolean didAttack = strategy.performAttack(ctx);
-        this.attackContext.setDidPerformAttack(didAttack);
+        ctx.setDidPerformAttack(didAttack);
 
         if (ctx.getTarget() == null || !ctx.getTarget().isAlive()) {
             log.info("After performing attack, target is null or dead");
