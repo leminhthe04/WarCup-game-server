@@ -61,16 +61,17 @@ public class SlotStateFactory {
         // Create the Towers for this slot
         Set<TowerDB> towerDBs = gameState.getGameMap().getTowers(slot);
         Set<Tower> towers = towerDBs.stream()
-                .map(towerDB -> {
-                    Tower tower = towerFactory.createTower(gameState, slotState, towerDB);
-                    if (tower == null) {
-                        log.info(">>> [SlotStateFactory] Tower creation failed for slot " + slot);
-                        return null;
-                    }
-                    gameStateService.addEntityTo(gameState, tower);
-                    return tower;
-                })
-                .collect(Collectors.toSet());
+            .map(towerDB -> {
+                Tower tower = towerFactory.createTower(gameState, slotState, towerDB);
+                if (tower == null) {
+                    log.info(">>> [SlotStateFactory] Tower creation failed for slot " + slot);
+                    return null;
+                }
+                log.info(">>> Tower ID={} created for slot ID={}", tower.getStringId(), slotState.getSlotNumber());
+                gameStateService.addEntityTo(gameState, tower);
+                return tower;
+            })
+            .collect(Collectors.toSet());
 
         slotState.setTowers(towers);
 

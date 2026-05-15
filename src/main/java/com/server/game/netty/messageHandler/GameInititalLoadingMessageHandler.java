@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import com.server.game.factory.GameStateFactory;
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.SlotState;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.initialGameState.ChampionInitialStatsSend;
 import com.server.game.netty.sendObject.initialGameState.InitialPositionsSend;
@@ -26,13 +27,18 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GameInititalLoadingMessageHandler {
 
-    GameStateFactory gameStateBuilder;
+    GameStateFactory gameStateFactory;
     GameCoordinator gameCoordinator;
     MinionService minionService;
     
     // This method is called by LobbyHandler when all players are ready
     public void loadInitial(Channel channel) {
-        GameState gameState = gameStateBuilder.createGameState(channel);
+        GameState gameState = gameStateFactory.createGameState(channel);
+
+        log.info("gameState Id={}: {}", gameState.getGameId(), gameState);
+        for (SlotState slotState : gameState.getSlotStates().values()) {
+            log.info("Towerlist of slot ID={}: {}", slotState.getSlotNumber(), slotState.getTowers());
+        }
 
         // broadcast initial positions
         ChannelFuture future = 

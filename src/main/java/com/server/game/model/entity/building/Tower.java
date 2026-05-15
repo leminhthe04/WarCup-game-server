@@ -1,48 +1,40 @@
 package com.server.game.model.entity.building;
 
-
 import java.util.UUID;
 
 import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.attackStrategy.TowerAttackStrategy;
-import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.resource.modelInfo.SlotInfo.TowerDB;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 
-
-@EqualsAndHashCode(callSuper=false)
+// @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public final class Tower extends Building {
 
-    @Delegate
-    final AttackComponent attackComponent;
-
     public Tower(SlotState ownerSlot, GameState gameState, TowerDB towerDB) {
         super("tower_" + ownerSlot.getSlotNumber() + UUID.randomUUID().toString(),
-        ownerSlot, gameState, 
-        gameState.getGameMap().getTowerHP(), 
-        gameState.getGameMap().getTowerDefense(), 
-        towerDB.getId(), towerDB.getPosition(),
-        towerDB.getWidth(), towerDB.getLength(), towerDB.getRotate());
+                ownerSlot, gameState,
+                gameState.getGameMap().getTowerHP(),
+                gameState.getGameMap().getTowerDefense(),
+                towerDB.getId(), towerDB.getPosition(),
+                towerDB.getWidth(), towerDB.getLength(), towerDB.getRotate(),
 
-        this.attackComponent = new AttackComponent(
-            this,
-            gameState.getGameMap().getTowerAttack(),
-            gameState.getGameMap().getTowerAttackSpeed(),
-            gameState.getGameMap().getTowerAttackRange(), 
-            new TowerAttackStrategy()
+                gameState.getGameMap().getTowerAttack(),
+                gameState.getGameMap().getTowerAttackSpeed(),
+                gameState.getGameMap().getTowerAttackRange(),
+                new TowerAttackStrategy()
         );
 
-        this.addAllComponents();
+
+        // this.addAllComponents();
     }
 
     @Override
@@ -52,7 +44,8 @@ public final class Tower extends Building {
         this.decreaseHP(actualDamage);
 
         ctx.addExtraData("actualDamage", actualDamage);
-        ctx.getGameStateService().sendHealthUpdate(ctx.getGameId(), ctx.getTarget(), ctx.getActualDamage(), System.currentTimeMillis());
+        ctx.getGameStateService().sendHealthUpdate(ctx.getGameId(), ctx.getTarget(), ctx.getActualDamage(),
+                System.currentTimeMillis());
 
         if (!this.isAlive()) {
             this.handleDeath(ctx.getAttacker());
@@ -64,7 +57,7 @@ public final class Tower extends Building {
 
     @Override
     protected void addAllComponents() {
-        this.addComponent(AttackComponent.class, this.attackComponent);
+        // this.addComponent(AttackComponent.class, this.attackComponent);
     }
 
     @Override

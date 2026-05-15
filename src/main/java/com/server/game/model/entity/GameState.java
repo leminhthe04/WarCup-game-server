@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import com.server.game.factory.SlotStateFactory;
+import com.server.game.model.entity.building.Building;
 import com.server.game.model.map.component.GridCell;
 import com.server.game.model.map.component.Vector2;
 import com.server.game.resource.modelInfo.GameMapGridInfo;
@@ -354,4 +355,21 @@ public class GameState {
     public Integer getBurgsInitHP() {
         return gameMap.getBurgHP();
     }
+
+
+    public Set<Minion> getAllMinions() {
+        return this.stringId2Entity.values().stream()
+        .filter(Minion.class::isInstance)
+        .map(Minion.class::cast)
+        .collect(Collectors.toSet());
+    }
+
+    public Set<Building> getAllBuildings() {
+        return this.stringId2Entity.values().stream()
+        .filter(Building.class::isInstance)
+        .map(Building.class::cast)
+        .collect(Collectors.toSet());
+    }
+
+    
 }

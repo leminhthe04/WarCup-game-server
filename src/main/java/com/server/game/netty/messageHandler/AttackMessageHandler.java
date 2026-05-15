@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import com.server.game.annotation.customAnnotation.MessageMapping;
 import com.server.game.factory.AttackContextFactory;
 import com.server.game.model.entity.Entity;
-import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.receiveObject.attack.AttackReceive;
@@ -71,11 +70,11 @@ public class AttackMessageHandler {
             return;
         }
 
-        if (attacker instanceof Minion minion) {
-            minion.setInDefensiveStance(false);
-            minion.setDefensePosition(null);
-            log.info("Minion {} defensive stance disabled", attackerStringId);
-        }
+        // if (attacker instanceof Minion minion) {
+        //     minion.setInDefensiveStance(false);
+        //     minion.setDefensePosition(null);
+        //     log.info("Minion {} defensive stance disabled", attackerStringId);
+        // }
 
         AttackContext attackContext = attackContextFactory.createAttackContext(attacker, target);
 

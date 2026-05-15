@@ -1,365 +1,365 @@
-package com.server.game.service.defense;
-
-import com.server.game.factory.AttackContextFactory;
-import com.server.game.model.entity.Entity;
-import com.server.game.model.entity.GameState;
-import com.server.game.model.entity.Minion;
-import com.server.game.model.map.component.Vector2;
-import com.server.game.service.attack.AttackService;
-import com.server.game.service.move.MoveService;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class DefensiveStanceService {
-
-    private final MoveService moveService;
-    private final AttackService attackService;
-    private final AttackContextFactory attackContextFactory;
-
-    public void updateDefensiveStances(GameState gameState) {
+// package com.server.game.service.defense;
+
+// import com.server.game.factory.AttackContextFactory;
+// import com.server.game.model.entity.Entity;
+// import com.server.game.model.entity.GameState;
+// import com.server.game.model.entity.Minion;
+// import com.server.game.model.map.component.Vector2;
+// import com.server.game.service.attack.AttackService;
+// import com.server.game.service.move.MoveService;
+
+// import lombok.RequiredArgsConstructor;
+// import lombok.extern.slf4j.Slf4j;
+
+// import org.springframework.stereotype.Service;
+
+// import java.util.ArrayList;
+// import java.util.Comparator;
+// import java.util.List;
+// import java.util.Objects;
+// import java.util.Optional;
+
+// @Slf4j
+// @Service
+// @RequiredArgsConstructor
+// public class DefensiveStanceService {
+
+//     private final MoveService moveService;
+//     private final AttackService attackService;
+//     private final AttackContextFactory attackContextFactory;
+
+//     public void updateDefensiveStances(GameState gameState) {
 
-        if (gameState == null) {
-            return;
-        }
+//         if (gameState == null) {
+//             return;
+//         }
 
-        try {
+//         try {
 
-            // Snapshot to avoid concurrent modification / inconsistent iteration
-            List<Entity> entitiesSnapshot = new ArrayList<>(gameState.getEntities());
+//             // Snapshot to avoid concurrent modification / inconsistent iteration
+//             List<Entity> entitiesSnapshot = new ArrayList<>(gameState.getEntities());
 
-            entitiesSnapshot.stream()
-                    .filter(Objects::nonNull)
-                    .filter(Minion.class::isInstance)
-                    .map(Minion.class::cast)
-                    .forEach(minion -> {
-                        try {
+//             entitiesSnapshot.stream()
+//                     .filter(Objects::nonNull)
+//                     .filter(Minion.class::isInstance)
+//                     .map(Minion.class::cast)
+//                     .forEach(minion -> {
+//                         try {
 
-                            if (!isValidMinion(minion)) {
-                                return;
-                            }
+//                             if (!isValidMinion(minion)) {
+//                                 return;
+//                             }
 
-                            // Re-enable defensive stance if needed
-                            minion.checkAndEnableDefensiveStance();
+//                             // Re-enable defensive stance if needed
+//                             minion.checkAndEnableDefensiveStance();
 
-                            // Process defensive AI
-                            processMinionDefense(minion, entitiesSnapshot);
+//                             // Process defensive AI
+//                             processMinionDefense(minion, entitiesSnapshot);
 
-                        } catch (Throwable t) {
+//                         } catch (Throwable t) {
 
-                            try {
-                                log.error(
-                                        "Error while processing minion defense. gameId={}, minionId={}",
-                                        gameState.getGameId(),
-                                        safeEntityId(minion),
-                                        t);
-                            } catch (Throwable ignored) {
-                            }
-                        }
-                    });
+//                             try {
+//                                 log.error(
+//                                         "Error while processing minion defense. gameId={}, minionId={}",
+//                                         gameState.getGameId(),
+//                                         safeEntityId(minion),
+//                                         t);
+//                             } catch (Throwable ignored) {
+//                             }
+//                         }
+//                     });
 
-        } catch (Throwable t) {
+//         } catch (Throwable t) {
 
-            try {
-                log.error(
-                        "Error in updateDefensiveStances. gameId={}",
-                        gameState.getGameId(),
-                        t);
-            } catch (Throwable ignored) {
-            }
-        }
-    }
+//             try {
+//                 log.error(
+//                         "Error in updateDefensiveStances. gameId={}",
+//                         gameState.getGameId(),
+//                         t);
+//             } catch (Throwable ignored) {
+//             }
+//         }
+//     }
 
-    private void processMinionDefense(
-            Minion minion,
-            List<Entity> entitiesSnapshot) {
+//     private void processMinionDefense(
+//             Minion minion,
+//             List<Entity> entitiesSnapshot) {
 
-        // Defensive stance disabled
-        if (!minion.isInDefensiveStance()) {
-            return;
-        }
+//         // Defensive stance disabled
+//         if (!minion.isInDefensiveStance()) {
+//             return;
+//         }
 
-        // Invalid state
-        if (!hasValidPosition(minion)) {
-            clearCombatState(minion);
-            return;
-        }
+//         // Invalid state
+//         if (!hasValidPosition(minion)) {
+//             clearCombatState(minion);
+//             return;
+//         }
 
-        // -----------------------------------------
-        // Outside defense range -> return home
-        // -----------------------------------------
-        if (!safeIsWithinOwnDefenseRange(minion)) {
+//         // -----------------------------------------
+//         // Outside defense range -> return home
+//         // -----------------------------------------
+//         if (!safeIsWithinOwnDefenseRange(minion)) {
 
-            if (minion.getDefensiveTarget() != null) {
+//             if (minion.getDefensiveTarget() != null) {
 
-                log.debug(
-                        "Minion {} outside defense range. Clearing target.",
-                        safeEntityId(minion));
+//                 log.debug(
+//                         "Minion {} outside defense range. Clearing target.",
+//                         safeEntityId(minion));
 
-                clearCombatState(minion);
-            }
+//                 clearCombatState(minion);
+//             }
 
-            safeMoveToDefensePosition(minion);
+//             safeMoveToDefensePosition(minion);
 
-            return;
-        }
+//             return;
+//         }
 
-        // -----------------------------------------
-        // Existing target handling
-        // -----------------------------------------
-        Entity target = minion.getDefensiveTarget();
+//         // -----------------------------------------
+//         // Existing target handling
+//         // -----------------------------------------
+//         Entity target = minion.getDefensiveTarget();
 
-        if (target != null) {
+//         if (target != null) {
 
-            if (!isValidCombatTarget(minion, target)) {
+//             if (!isValidCombatTarget(minion, target)) {
 
-                clearCombatState(minion);
+//                 clearCombatState(minion);
 
-                safeMoveToDefensePosition(minion);
+//                 safeMoveToDefensePosition(minion);
 
-                log.trace("Minion {} disengaged from invalid target.",
-                        safeEntityId(minion));
+//                 log.trace("Minion {} disengaged from invalid target.",
+//                         safeEntityId(minion));
 
-                return;
-            }
+//                 return;
+//             }
 
-            double distance = minion.getCurrentPosition().distance(target.getCurrentPosition());
+//             double distance = minion.getCurrentPosition().distance(target.getCurrentPosition());
 
-            boolean targetInRange = distance <= minion.getDetectionRange();
+//             boolean targetInRange = distance <= minion.getDetectionRange();
 
-            if (!target.isAlive() || !targetInRange) {
+//             if (!target.isAlive() || !targetInRange) {
 
-                clearCombatState(minion);
+//                 clearCombatState(minion);
 
-                safeMoveToDefensePosition(minion);
+//                 safeMoveToDefensePosition(minion);
 
-                log.trace(
-                        "Minion {} target out of range/dead.",
-                        safeEntityId(minion));
+//                 log.trace(
+//                         "Minion {} target out of range/dead.",
+//                         safeEntityId(minion));
 
-                return;
-            }
+//                 return;
+//             }
 
-            // Continue attacking
-            if (!minion.isAttacking()) {
+//             // Continue attacking
+//             if (!minion.isAttacking()) {
 
-                try {
+//                 try {
 
-                    attackService.setAttack(
-                            attackContextFactory.createAttackContext(
-                                    minion,
-                                    target));
+//                     attackService.setAttack(
+//                             attackContextFactory.createAttackContext(
+//                                     minion,
+//                                     target));
 
-                } catch (Throwable t) {
+//                 } catch (Throwable t) {
 
-                    log.warn(
-                            "Failed to set attack context. attacker={}, target={}",
-                            safeEntityId(minion),
-                            safeEntityId(target),
-                            t);
-                }
-            }
+//                     log.warn(
+//                             "Failed to set attack context. attacker={}, target={}",
+//                             safeEntityId(minion),
+//                             safeEntityId(target),
+//                             t);
+//                 }
+//             }
 
-            return;
-        }
+//             return;
+//         }
 
-        // -----------------------------------------
-        // Find new target
-        // -----------------------------------------
-        findNearestEnemyInDetectionRange(
-                minion,
-                entitiesSnapshot).ifPresent(enemy -> {
+//         // -----------------------------------------
+//         // Find new target
+//         // -----------------------------------------
+//         findNearestEnemyInDetectionRange(
+//                 minion,
+//                 entitiesSnapshot).ifPresent(enemy -> {
 
-                    try {
+//                     try {
 
-                        minion.setDefensiveTarget(enemy);
+//                         minion.setDefensiveTarget(enemy);
 
-                        attackService.setAttack(
-                                attackContextFactory.createAttackContext(
-                                        minion,
-                                        enemy));
+//                         attackService.setAttack(
+//                                 attackContextFactory.createAttackContext(
+//                                         minion,
+//                                         enemy));
 
-                        log.trace(
-                                "Minion {} detected enemy {}",
-                                safeEntityId(minion),
-                                safeEntityId(enemy));
+//                         log.trace(
+//                                 "Minion {} detected enemy {}",
+//                                 safeEntityId(minion),
+//                                 safeEntityId(enemy));
 
-                    } catch (Throwable t) {
+//                     } catch (Throwable t) {
 
-                        log.warn(
-                                "Failed to engage target. attacker={}, target={}",
-                                safeEntityId(minion),
-                                safeEntityId(enemy),
-                                t);
+//                         log.warn(
+//                                 "Failed to engage target. attacker={}, target={}",
+//                                 safeEntityId(minion),
+//                                 safeEntityId(enemy),
+//                                 t);
 
-                        clearCombatState(minion);
-                    }
-                });
+//                         clearCombatState(minion);
+//                     }
+//                 });
 
-        // -----------------------------------------
-        // Return to defense post if idle
-        // -----------------------------------------
-        if (minion.getDefensiveTarget() == null
-                && !minion.isMoving()) {
+//         // -----------------------------------------
+//         // Return to defense post if idle
+//         // -----------------------------------------
+//         if (minion.getDefensiveTarget() == null
+//                 && !minion.isMoving()) {
 
-            Vector2 currentPos = minion.getCurrentPosition();
-            Vector2 defensePos = minion.getDefensePosition();
+//             Vector2 currentPos = minion.getCurrentPosition();
+//             Vector2 defensePos = minion.getDefensePosition();
 
-            if (currentPos == null || defensePos == null) {
-                return;
-            }
+//             if (currentPos == null || defensePos == null) {
+//                 return;
+//             }
 
-            double distance = currentPos.distance(defensePos);
+//             double distance = currentPos.distance(defensePos);
 
-            if (distance > 0.5f) {
+//             if (distance > 0.5f) {
 
-                log.trace(
-                        "Minion {} returning to defense post.",
-                        safeEntityId(minion));
+//                 log.trace(
+//                         "Minion {} returning to defense post.",
+//                         safeEntityId(minion));
 
-                safeMoveToDefensePosition(minion);
-            }
-        }
-    }
+//                 safeMoveToDefensePosition(minion);
+//             }
+//         }
+//     }
 
-    private Optional<Entity> findNearestEnemyInDetectionRange(
-            Minion minion,
-            List<Entity> entitiesSnapshot) {
+//     private Optional<Entity> findNearestEnemyInDetectionRange(
+//             Minion minion,
+//             List<Entity> entitiesSnapshot) {
 
-        if (!hasValidPosition(minion)) {
-            return Optional.empty();
-        }
+//         if (!hasValidPosition(minion)) {
+//             return Optional.empty();
+//         }
 
-        Vector2 minionPos = minion.getCurrentPosition();
+//         Vector2 minionPos = minion.getCurrentPosition();
 
-        return entitiesSnapshot.stream()
-                .filter(Objects::nonNull)
-                .filter(Entity::isAlive)
-                .filter(this::hasValidPosition)
-                .filter(e -> e.getOwnerSlot() != null)
-                .filter(e -> minion.getOwnerSlot() != null)
-                .filter(e -> e.getOwnerSlot().getSlotNumber() != minion.getOwnerSlot().getSlotNumber())
-                .filter(e -> {
+//         return entitiesSnapshot.stream()
+//                 .filter(Objects::nonNull)
+//                 .filter(Entity::isAlive)
+//                 .filter(this::hasValidPosition)
+//                 .filter(e -> e.getOwnerSlot() != null)
+//                 .filter(e -> minion.getOwnerSlot() != null)
+//                 .filter(e -> e.getOwnerSlot().getSlotNumber() != minion.getOwnerSlot().getSlotNumber())
+//                 .filter(e -> {
 
-                    double distance = minionPos.distance(e.getCurrentPosition());
+//                     double distance = minionPos.distance(e.getCurrentPosition());
 
-                    return distance <= minion.getDetectionRange();
-                })
-                .min(
-                        Comparator.comparingDouble(e -> minionPos.distance(e.getCurrentPosition())));
-    }
+//                     return distance <= minion.getDetectionRange();
+//                 })
+//                 .min(
+//                         Comparator.comparingDouble(e -> minionPos.distance(e.getCurrentPosition())));
+//     }
 
-    // =========================================================
-    // Utility methods
-    // =========================================================
+//     // =========================================================
+//     // Utility methods
+//     // =========================================================
 
-    private boolean isValidMinion(Minion minion) {
+//     private boolean isValidMinion(Minion minion) {
 
-        return minion != null
-                && minion.isAlive()
-                && hasValidPosition(minion)
-                && minion.getOwnerSlot() != null;
-    }
+//         return minion != null
+//                 && minion.isAlive()
+//                 && hasValidPosition(minion)
+//                 && minion.getOwnerSlot() != null;
+//     }
 
-    private boolean isValidCombatTarget(
-            Minion attacker,
-            Entity target) {
+//     private boolean isValidCombatTarget(
+//             Minion attacker,
+//             Entity target) {
 
-        return target != null
-                && target.isAlive()
-                && hasValidPosition(attacker)
-                && hasValidPosition(target)
-                && target.getOwnerSlot() != null
-                && attacker.getOwnerSlot() != null
-                && target.getOwnerSlot().getSlotNumber() != attacker.getOwnerSlot().getSlotNumber();
-    }
+//         return target != null
+//                 && target.isAlive()
+//                 && hasValidPosition(attacker)
+//                 && hasValidPosition(target)
+//                 && target.getOwnerSlot() != null
+//                 && attacker.getOwnerSlot() != null
+//                 && target.getOwnerSlot().getSlotNumber() != attacker.getOwnerSlot().getSlotNumber();
+//     }
 
-    private boolean hasValidPosition(Entity entity) {
+//     private boolean hasValidPosition(Entity entity) {
 
-        return entity != null
-                && entity.getCurrentPosition() != null;
-    }
+//         return entity != null
+//                 && entity.getCurrentPosition() != null;
+//     }
 
-    private boolean safeIsWithinOwnDefenseRange(Minion minion) {
+//     private boolean safeIsWithinOwnDefenseRange(Minion minion) {
 
-        try {
-            return minion.isWithinOwnDefenseRange();
-        } catch (Throwable t) {
+//         try {
+//             return minion.isWithinOwnDefenseRange();
+//         } catch (Throwable t) {
 
-            log.warn("Failed checking defense range for minion={}",
-                    safeEntityId(minion),
-                    t);
+//             log.warn("Failed checking defense range for minion={}",
+//                     safeEntityId(minion),
+//                     t);
 
-            return false;
-        }
-    }
+//             return false;
+//         }
+//     }
 
-    private void safeMoveToDefensePosition(Minion minion) {
+//     private void safeMoveToDefensePosition(Minion minion) {
 
-        try {
+//         try {
 
-            Vector2 defensePosition = minion.getDefensePosition();
+//             Vector2 defensePosition = minion.getDefensePosition();
 
-            if (defensePosition == null) {
-                return;
-            }
+//             if (defensePosition == null) {
+//                 return;
+//             }
 
-            moveService.setMove(
-                    minion,
-                    defensePosition,
-                    true);
+//             moveService.setMove(
+//                     minion,
+//                     defensePosition,
+//                     true);
 
-        } catch (Throwable t) {
+//         } catch (Throwable t) {
 
-            log.warn(
-                    "Failed moving minion back to defense position. minion={}",
-                    safeEntityId(minion),
-                    t);
-        }
-    }
+//             log.warn(
+//                     "Failed moving minion back to defense position. minion={}",
+//                     safeEntityId(minion),
+//                     t);
+//         }
+//     }
 
-    private void clearCombatState(Minion minion) {
+//     private void clearCombatState(Minion minion) {
 
-        try {
+//         try {
 
-            minion.setDefensiveTarget(null);
+//             minion.setDefensiveTarget(null);
 
-            if (minion.getAttackComponent() != null) {
-                minion.getAttackComponent().setAttackContext(null);
-            }
+//             if (minion.getAttackComponent() != null) {
+//                 minion.getAttackComponent().setAttackContext(null);
+//             }
 
-        } catch (Throwable t) {
+//         } catch (Throwable t) {
 
-            log.warn(
-                    "Failed clearing combat state for minion={}",
-                    safeEntityId(minion),
-                    t);
-        }
-    }
+//             log.warn(
+//                     "Failed clearing combat state for minion={}",
+//                     safeEntityId(minion),
+//                     t);
+//         }
+//     }
 
-    private String safeEntityId(Entity entity) {
+//     private String safeEntityId(Entity entity) {
 
-        try {
+//         try {
 
-            if (entity == null) {
-                return "null";
-            }
+//             if (entity == null) {
+//                 return "null";
+//             }
 
-            return entity.getStringId();
+//             return entity.getStringId();
 
-        } catch (Throwable t) {
-            return "unknown";
-        }
-    }
-}
+//         } catch (Throwable t) {
+//             return "unknown";
+//         }
+//     }
+// }

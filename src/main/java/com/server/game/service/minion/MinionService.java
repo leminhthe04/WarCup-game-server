@@ -1,17 +1,19 @@
 package com.server.game.service.minion;
 
+import org.springframework.stereotype.Service;
 import com.server.game.factory.MinionFactory;
 import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.building.Burg;
-import com.server.game.model.entity.building.Tower;
 import com.server.game.model.entity.Minion;
-import com.server.game.model.entity.context.AttackContext;
+import com.server.game.model.map.component.Vector2;
+import com.server.game.model.map.shape.CircleShape;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.entity.EntityDeathSend;
 import com.server.game.resource.modelInfo.MinionInfo;
 import com.server.game.service.attack.AttackService;
+import com.server.game.service.move.MoveService;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.gameState.SlotStateService;
 import com.server.game.factory.AttackContextFactory;
@@ -23,9 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.stereotype.Service;
-
 import io.netty.channel.Channel;
+
 
 @Slf4j
 @Service
@@ -37,6 +38,7 @@ public class MinionService {
     private final MinionFactory minionFactory;
     private final AttackContextFactory attackContextFactory;
     private final AttackService attackService;
+    private final MoveService moveService;
 
     public Set<MinionInfo> getAllMinions() {
         return minionFactory.getAllMinions();
@@ -74,62 +76,67 @@ public class MinionService {
      * By default, after spawning, minions will move to and attack the opponent's
      * burg.
      */
-    public void afterMinionSpawning(Minion newMinion) {
-        GameState gameState = newMinion.getGameState();
+    public void setMoveFollowingStandardPath(Minion minion) {
+        GameState gameState = minion.getGameState();
 
         List<SlotState> slotStates = gameStateService.getAllSlotStates(gameState);
         if (slotStates == null || slotStates.size() < 2) {
             throw new IllegalStateException("Not enough slot states found in game state for minion to attack");
         }
 
-        List<SlotState> opponentSlots = slotStates.stream()
-                .filter(slotState -> !slotState.equals(newMinion.getOwnerSlot()))
+        List<SlotState> enemiesSlots = slotStates.stream()
+                .filter(slotState -> !slotState.equals(minion.getOwnerSlot()))
                 .toList();
 
-        if (opponentSlots == null || opponentSlots.size() < 1) {
+        if (enemiesSlots == null || enemiesSlots.isEmpty()) {
             log.error("cannot find opponent slot to set minion attack");
         }
 
         // TODO: Handle if there are more than one opponent (in 3+ player games)
-        SlotState targetSlot = opponentSlots.get(0);
-        
-        List<Tower> sortedTowers = slotStateService.getTowers(targetSlot);
-        // a first alive Tower in list above. 
-        // if all targetSlot's towers are not alive, it's a Burg
-        Entity targetEntity = null;
-        for (Tower tower : sortedTowers) {
-            if (tower.isAlive()) {
-                targetEntity = tower;
-                break;
-            }
-        }
+        SlotState enemySlot = enemiesSlots.get(0);
 
-        if (targetEntity == null) {
-            Burg targetBurg = slotStateService.getBurg(targetSlot);
-            targetEntity = targetBurg;
-        }
+        // List<Tower> sortedTowers = slotStateService.getTowers(targetSlot);
+        // // a first alive Tower in list above.
+        // // if all targetSlot's towers are not alive, it's a Burg
+        // Entity targetEntity = null;
+        // for (Tower tower : sortedTowers) {
+        // if (tower.isAlive()) {
+        // targetEntity = tower;
+        // break;
+        // }
+        // }
 
-        this.setAttackTarget(newMinion, targetEntity);
+        // if (targetEntity == null) {
+        // Burg targetBurg = slotStateService.getBurg(targetSlot);
+        // targetEntity = targetBurg;
+        // }
 
-        log.info("Minion spawned and move toward to opponent's tower or burg to attack. MinionId: {}, TargetBuildingId: {}",
-                newMinion.getStringId(), targetEntity.getStringId());
+        Burg enemyBurg = slotStateService.getBurg(enemySlot);
+
+        Vector2 moveTo = enemyBurg.getCurrentPosition();
+
+        moveService.setMove(minion, moveTo, true);
+
+        log.info("Minion follow standard road, move toward to opponent's side. MinionId: {}",
+                minion.getStringId());
     }
 
     /**
      * Attack a target
      */
-    public void setAttackTarget(Minion minion, Entity target) {
-        if (minion == null) {
-            log.warn("Minion instance not found");
-            return;
-        }
+    // public void setAttackTarget(Minion minion, Entity target) {
+    // if (minion == null) {
+    // log.warn("Minion instance not found");
+    // return;
+    // }
 
-        minion.setInDefensiveStance(false); // Disable defense on manual attack
+    // minion.setInDefensiveStance(false); // Disable defense on manual attack
 
-        AttackContext attackContext = attackContextFactory.createAttackContext(minion, target);
+    // AttackContext attackContext =
+    // attackContextFactory.createAttackContext(minion, target);
 
-        attackService.setAttack(attackContext);
-    }
+    // attackService.setAttack(attackContext);
+    // }
 
     /**
      * Set move position for a minion instance
@@ -233,4 +240,73 @@ public class MinionService {
             log.warn("No channel found for gameId: {} when sending minion death message", gameId);
         }
     }
+
+    public void checkStopChasing(GameState gameState) {
+        Set<Minion> minions = gameStateService.getAllMinions(gameState);
+        minions.forEach(minion -> this.checkStopChasingOf(minion));
+    }
+
+    private void checkStopChasingOf(Minion minion) {
+        CircleShape chasingScope = minion.getChasingScope();
+        
+        boolean needStopChasing = chasingScope != null && 
+            minion.distanceTo(chasingScope.getCenter()) > chasingScope.getRadius();
+
+        if (!needStopChasing) { return; }
+
+        minion.setChasingScope(null);
+
+        // back to standard path after interrupting chasing enemy
+        this.setMoveFollowingStandardPath(minion);
+    }
+
+    public void updateDetections(GameState gameState) {
+        Set<Minion> minions = gameStateService.getAllMinions(gameState);
+        minions.forEach(minion -> this.updateDetectionOf(minion));
+    }
+
+    private void updateDetectionOf(Minion minion) {
+        if (minion == null || !minion.isAlive() || !minion.inDetectionWindow()) {
+            return;
+        }
+
+        List<Entity> sortedEnemiesInDetectionRange = minion.getSortedEnemiesInDetectionRange();
+
+        // no enemies in minion's detection range
+        if (sortedEnemiesInDetectionRange == null || sortedEnemiesInDetectionRange.isEmpty()) {
+            return;
+        }
+
+        Entity highestPrioEntity = null;
+        for (Entity enemy : sortedEnemiesInDetectionRange) {
+            if (enemy != null && enemy.isAlive()) {
+                highestPrioEntity = enemy;
+                break;
+            }
+        }
+
+        boolean needUpdatingAttackEnemy = highestPrioEntity != null &&
+                (!minion.isAttacking() || // is not attacking or is attacking but lower prio entity
+                        highestPrioEntity.getNpcPriorityEnum().higher(
+                                minion.getCurrentAttackEntity().getNpcPriorityEnum()));
+
+        if (!needUpdatingAttackEnemy) {
+            return;
+        }
+
+        // 1. Assign new attacking entity
+        attackService.setAttack(
+            attackContextFactory.createAttackContext(minion, highestPrioEntity)
+        );
+
+        // 2. Set up chasing range
+        minion.setChasingScope(new CircleShape(
+            minion.getCurrentPosition(), minion.getDetectionRange()));
+
+
+        log.info("Minion id={} detected entity id={} and is set to attack this entity", minion.getStringId(), highestPrioEntity.getStringId());
+
+    }
+
+    
 }

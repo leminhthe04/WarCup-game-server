@@ -93,8 +93,6 @@ public final class Champion extends DependentEntity implements SkillReceivable {
 
     @Override
     public void afterUpdatePosition() {
-        // log.info("Call afterUpdatePosition for champion, check in playground and call
-        // super method...");
 
         this.checkInPlayground();
 

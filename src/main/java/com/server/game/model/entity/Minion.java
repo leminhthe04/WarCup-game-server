@@ -8,11 +8,13 @@ import com.server.game.model.entity.component.MovingComponent;
 import com.server.game.model.entity.component.attributeComponent.MinionAttributeComponent;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.model.entity.context.CastSkillContext;
+import com.server.game.model.entity.entityIface.NPC;
 import com.server.game.model.entity.entityIface.SkillReceivable;
-import com.server.game.model.map.component.Vector2;
+import com.server.game.model.map.shape.CircleShape;
 import com.server.game.resource.modelInfo.MinionInfo;
 import com.server.game.util.MinionEnum;
 import com.server.game.util.NPCPriorityEnum;
+import com.server.game.util.Util;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -27,7 +29,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Minion extends DependentEntity implements SkillReceivable {
+public class Minion extends DependentEntity implements SkillReceivable, NPC {
 
     final MinionEnum minionEnum;
 
@@ -40,10 +42,14 @@ public class Minion extends DependentEntity implements SkillReceivable {
     @Delegate
     final AttackComponent attackComponent;
 
-    Vector2 defensePosition;
-    float defenseRange;
-    boolean inDefensiveStance = true;
-    Entity defensiveTarget = null;
+    CircleShape chasingScope = null;
+
+    final int detectionDelayTick = Math.round(5 * 1000.0f/Util.getGameTickIntervalMs());
+    long nextDetectionTick;
+    // this.attackDelayTick = Math.round(1000.0f / (attackSpeed * Util.getGameTickIntervalMs()));
+    //     this.nextAttackTick = 0;
+
+
 
     public Minion(MinionInfo troopDB, SlotState ownerSlot) {
         super("minion_" + UUID.randomUUID().toString(), ownerSlot);
@@ -64,6 +70,7 @@ public class Minion extends DependentEntity implements SkillReceivable {
 
         this.healthComponent = new HealthComponent(
                 troopDB.getStats().getHp());
+
         this.attackComponent = new AttackComponent(
                 this,
                 troopDB.getStats().getAttack(),
@@ -71,9 +78,12 @@ public class Minion extends DependentEntity implements SkillReceivable {
                 troopDB.getStats().getAttackRange(),
                 new MinionAttackStrategy());
 
-        this.defenseRange = this.attributeComponent.getDetectionRange() * 1.5f;
+        // this.defenseRange = this.attributeComponent.getDetectionRange() * 1.5f;
 
         this.addAllComponents();
+
+        this.nextDetectionTick = this.gameState.getCurrentTick();
+
 
         log.debug("Created minion instance {} of type {} for player {} of gameid={}, at position {}",
                 stringId, minionEnum, ownerSlot, gameState.getGameId(), this.getCurrentPosition());
@@ -94,24 +104,32 @@ public class Minion extends DependentEntity implements SkillReceivable {
 
     @Override
     public void afterUpdatePosition() {
-        // Check if minion is in defensive stance and has moved outside defense range
-        if (inDefensiveStance && defensePosition != null && !isWithinOwnDefenseRange()) {
-            // If minion has no target or target is no longer valid, return to defense
-            // position
-            if (defensiveTarget == null || !defensiveTarget.isAlive() || !isWithinDefenseRange(defensiveTarget)) {
-                // Clear any current attack and return to defense position
-                this.attackComponent.setAttackContext(null);
-                this.defensiveTarget = null;
+        // // Check if minion is in defensive stance and has moved outside defense range
+        // if (inDefensiveStance && defensePosition != null && !isWithinOwnDefenseRange()) {
+        //     // If minion has no target or target is no longer valid, return to defense
+        //     // position
+        //     if (defensiveTarget == null || !defensiveTarget.isAlive() || !isWithinDefenseRange(defensiveTarget)) {
+        //         // Clear any current attack and return to defense position
+        //         this.attackComponent.setAttackContext(null);
+        //         this.defensiveTarget = null;
 
-                // Set movement back to defense position
-                // Note: We need access to MoveService2 to do this properly
-                // This will be handled by DefensiveStanceService in the next tick
-                log.trace("Troop {} is outside defense range. Will return to defense position {} in next tick.",
-                        stringId, defensePosition);
-            }
-        }
+        //         // Set movement back to defense position
+        //         // Note: We need access to MoveService2 to do this properly
+        //         // This will be handled by DefensiveStanceService in the next tick
+        //         log.trace("Troop {} is outside defense range. Will return to defense position {} in next tick.",
+        //                 stringId, defensePosition);
+        //     }
+        // }
 
         super.afterUpdatePosition();
+    }
+
+    public boolean inDetectionWindow() {
+        return this.nextDetectionTick <= this.gameState.getCurrentTick();
+    }
+
+    public void updateNextDetectionTick() {
+        this.nextDetectionTick += detectionDelayTick;
     }
 
     /**
@@ -119,58 +137,58 @@ public class Minion extends DependentEntity implements SkillReceivable {
      * stance.
      * Defensive stance should be managed separately based on context availability.
      */
-    public void updateDefensePosition(Vector2 newPosition) {
-        this.defensePosition = newPosition;
-        this.defensiveTarget = null; // Clear previous target
-        this.attackComponent.setAttackContext(null); // Stop any current attack
-        log.debug("Troop {} defense position updated to {}.", stringId, defensePosition);
-    }
+    // public void updateDefensePosition(Vector2 newPosition) {
+    //     this.defensePosition = newPosition;
+    //     this.defensiveTarget = null; // Clear previous target
+    //     this.attackComponent.setAttackContext(null); // Stop any current attack
+    //     log.debug("Troop {} defense position updated to {}.", stringId, defensePosition);
+    // }
 
     /**
      * Checks if a target is within the minion's detection range (use detection
      * range for consistency)
      */
-    public boolean isWithinDefenseRange(Entity target) {
-        if (target == null || defensePosition == null) {
-            return false;
-        }
-        // Use detection range instead of defense range for consistency
-        // return defensePosition.distance(target.getCurrentPosition()) <=
-        // this.getDetectionRange();
-        return this.getCurrentPosition().distance(target.getCurrentPosition()) <= this.getDetectionRange();
+    // public boolean isWithinDefenseRange(Entity target) {
+    //     if (target == null || defensePosition == null) {
+    //         return false;
+    //     }
+    //     // Use detection range instead of defense range for consistency
+    //     // return defensePosition.distance(target.getCurrentPosition()) <=
+    //     // this.getDetectionRange();
+    //     return this.getCurrentPosition().distance(target.getCurrentPosition()) <= this.getDetectionRange();
 
-    }
+    // }
 
     /**
      * Checks if the minion itself is within its defense range (circle around
      * defense position).
      */
-    public boolean isWithinOwnDefenseRange() {
-        if (defensePosition == null) {
-            return true; // If no defense position set, consider it in range
-        }
-        return getCurrentPosition().distance(defensePosition) <= defenseRange;
-    }
+    // public boolean isWithinOwnDefenseRange() {
+    //     if (defensePosition == null) {
+    //         return true; // If no defense position set, consider it in range
+    //     }
+    //     return getCurrentPosition().distance(defensePosition) <= defenseRange;
+    // }
 
     /**
      * Checks if the minion has any active manual commands (move or attack contexts)
      */
-    public boolean hasActiveManualCommands() {
-        // Only consider it manual if it's not a defensive action
-        boolean hasManualAttack = this.attackComponent.isAttacking() && !inDefensiveStance;
-        boolean hasManualMove = this.movingComponent.isMoving() && !inDefensiveStance;
-        return hasManualAttack || hasManualMove;
-    }
+    // public boolean hasActiveManualCommands() {
+    //     // Only consider it manual if it's not a defensive action
+    //     boolean hasManualAttack = this.attackComponent.isAttacking() && !inDefensiveStance;
+    //     boolean hasManualMove = this.movingComponent.isMoving() && !inDefensiveStance;
+    //     return hasManualAttack || hasManualMove;
+    // }
 
     /**
      * Automatically enable defensive stance if no manual commands are active
      */
-    public void checkAndEnableDefensiveStance() {
-        if (!hasActiveManualCommands() && !inDefensiveStance) {
-            this.inDefensiveStance = true;
-            log.debug("Troop {} re-enabled defensive stance (no active manual commands)", stringId);
-        }
-    }
+    // public void checkAndEnableDefensiveStance() {
+    //     if (!hasActiveManualCommands() && !inDefensiveStance) {
+    //         this.inDefensiveStance = true;
+    //         log.debug("Troop {} re-enabled defensive stance (no active manual commands)", stringId);
+    //     }
+    // }
 
     @Override // from Attackable implemented by Entity
     public boolean receiveAttack(AttackContext ctx) {

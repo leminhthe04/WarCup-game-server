@@ -20,6 +20,7 @@ public class AttackComponent {
     int damage;
     float attackSpeed;
     float attackRange;
+
     int attackDelayTick;
     long nextAttackTick;
 
@@ -63,6 +64,11 @@ public class AttackComponent {
 
     public boolean isAttacking() {
         return this.attackContext != null && this.attackContext.getTarget() != null;
+    }
+
+    public <T> boolean isAttacking(Class<T> clazz) {
+        return this.attackContext != null
+                && clazz.isInstance(this.attackContext.getTarget());
     }
 
     private final boolean inAttackWindow(long currentTick) {

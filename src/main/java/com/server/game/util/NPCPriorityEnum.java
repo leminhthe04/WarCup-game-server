@@ -9,26 +9,30 @@ import lombok.AccessLevel;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum NPCPriorityEnum {
-    CHAMPION_ATKG_CHAMPION((short) 8),
-    MINION_ATKG_CHAMPION((short) 7),
-    MINION_ATKG_MINION((short) 6),
-    BUILDING_ATKG_MINION((short) 5),
-    CHAMPION_ATKG_MINION((short) 4),
-    BUILDING((short) 3),
+    CHAMPION_ATKG_CHAMPION((short) 1), // 1 means highest prio
+    MINION_ATKG_CHAMPION((short) 2),
+    MINION_ATKG_MINION((short) 3),
+    BUILDING_ATKG_MINION((short) 4),
+    CHAMPION_ATKG_MINION((short) 5),
+    BUILDING((short) 6),
     
     // champions and minions attacking building
     // have same prio as free champions and minions
-    CHAMPION_ATKG_BUILDING((short) 1),  
-    MINION_ATKG_BUILDING((short) 2),  
+    MINION_ATKG_BUILDING((short) 7),  
+    CHAMPION_ATKG_BUILDING((short) 8),  
     
-    MINION_FREE((short) 2),
-    CHAMPION_FREE((short) 1),
+    MINION_FREE((short) 7),
+    CHAMPION_FREE((short) 8),
     ;
 
     private final short npcPrio;
 
     public short toShort() {
         return this.npcPrio;
+    }
+
+    public boolean higher(NPCPriorityEnum other) {
+        return this.npcPrio < other.npcPrio;
     }
 
     public static NPCPriorityEnum fromShort(short p) {

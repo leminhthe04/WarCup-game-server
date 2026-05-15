@@ -24,7 +24,10 @@ public class GameCoordinator {
     private final Map<String, GameState> gameStates = new ConcurrentHashMap<>();
 
 
-    public GameCoordinator(@Lazy GameStateService gameStateService, @Lazy MinionMessageHandler troopMessageHandler) {
+    public GameCoordinator(
+        @Lazy GameStateService gameStateService, 
+        @Lazy MinionMessageHandler troopMessageHandler)
+    {
         this.gameStateService = gameStateService;
         this.troopMessageHandler = troopMessageHandler;
     }

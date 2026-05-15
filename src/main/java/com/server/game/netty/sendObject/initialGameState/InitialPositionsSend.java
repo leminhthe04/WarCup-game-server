@@ -25,8 +25,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class InitialPositionsSend implements TLVEncodable {
@@ -116,11 +117,15 @@ public class InitialPositionsSend implements TLVEncodable {
             this.rotate = gameState.getGameMap().getInitialRotate(this.slot);
             this.maxHP = champion.getMaxHP();
 
+            log.info("towersList of slotState ID={}: {}", slotState.getSlotNumber(), slotState.getTowers());
+
             this.towerDataList = slotState.getTowers().stream()
                 .map(tower -> new TowerData(gameState, slotState, tower))
                 .collect(Collectors.toSet());
 
             this.burgData = new BurgData(gameState, slotState);
+
+            System.out.println(this);
         }
 
         

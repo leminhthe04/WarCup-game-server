@@ -110,7 +110,8 @@ public class MinionMessageHandler {
         if (future != null) {
             future.addListener(f -> {
                 if (f.isSuccess()) {
-                    minionService.afterMinionSpawning(newMinion);
+                    // minions move following standard path right after spanwed
+                    minionService.setMoveFollowingStandardPath(newMinion);
                 } else {
                     log.warn("Error when broadcasting minion spawn");
                 }
@@ -171,7 +172,10 @@ public class MinionMessageHandler {
                 continue;
             }
 
-            moveService.setMove(minion, moveToPosition, true);
+            boolean didSetMoving = moveService.setMove(minion, moveToPosition, true);
+            if (didSetMoving) {
+                minion.updateNextDetectionTick(); // after being forced moving, disable detection of minion for a while
+            }
 
             log.debug("Moved minion {} to spread position {}", minionId, moveToPosition);
         }

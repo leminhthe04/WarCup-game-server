@@ -9,9 +9,8 @@ import com.server.game.model.entity.GameState;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.HeartbeatMessage;
 import com.server.game.service.attack.AttackService;
+import com.server.game.service.building.BuildingService;
 import com.server.game.service.castSkill.CastSkillService;
-import com.server.game.service.defense.DefenseService;
-import com.server.game.service.defense.DefensiveStanceService;
 import com.server.game.service.gameState.GameStateService;
 import com.server.game.service.gold.GoldService;
 import com.server.game.service.move.MoveService;
@@ -34,9 +33,8 @@ public class GameLogicScheduler {
     CastSkillService castSkillService;
     GoldService goldService;
     GameStateService gameStateService;
-    DefensiveStanceService defensiveStanceService;
-    DefenseService defenseService;
-    MinionService troopManager;
+    MinionService minionService;
+    BuildingService buildingService;
 
     /**
      * Main game logic loop - runs every 33ms (~30 FPS)
@@ -54,7 +52,7 @@ public class GameLogicScheduler {
                 attackService.processAttacks(gameState);
 
                 // Check for minion deaths and handle cleanup
-                troopManager.checkAndHandleAllMinionDeaths(gameState);
+                minionService.checkAndHandleAllMinionDeaths(gameState);
 
                 // Update movement positions
                 moveService.updatePositions(gameState);
@@ -62,6 +60,12 @@ public class GameLogicScheduler {
                 castSkillService.updateDurationSkills(gameState);
 
                 goldService.randomlyGenerateGoldMine(gameState);
+
+                minionService.checkStopChasing(gameState);
+
+                minionService.updateDetections(gameState);
+
+                buildingService.updateDetections(gameState);
 
             } catch (Exception e) {
                 log.error("Error in game logic loop for game: {}", gameState.getGameId(), e);
@@ -89,24 +93,24 @@ public class GameLogicScheduler {
      * Slower game logic loop - runs every 200ms (5 FPS)
      * Handles less critical game systems
      */
-    @Scheduled(fixedDelay = 200) // 200ms = 5 FPS for non-critical systems
-    public void slowGameLogicLoop() {
-        for (GameState gameState : gameStateService.getAllActiveGameStates()) {
-            try {
-                defensiveStanceService.updateDefensiveStances(gameState);
-                defenseService.updateDefenses(gameState);
-                // NOTE: Add slower update systems here
-                // - Resource generation
-                // - AI decision making
-                // - Game statistics updates
-                // - Health regeneration
-                // - Status effect updates
+    // @Scheduled(fixedDelay = 200) // 200ms = 5 FPS for non-critical systems
+    // public void slowGameLogicLoop() {
+    //     for (GameState gameState : gameStateService.getAllActiveGameStates()) {
+    //         try {
+    //             // defensiveStanceService.updateDefensiveStances(gameState);
+    //             // defenseService.updateDefenses(gameState);
+    //             // NOTE: Add slower update systems here
+    //             // - Resource generation
+    //             // - AI decision making
+    //             // - Game statistics updates
+    //             // - Health regeneration
+    //             // - Status effect updates
 
-            } catch (Throwable t) {
-                log.error("Error in slow game logic loop", t);
-            }
-        }
-    }
+    //         } catch (Throwable t) {
+    //             log.error("Error in slow game logic loop", t);
+    //         }
+    //     }
+    // }
 
     /**
      * Very slow game logic loop - runs every 1000ms (1 FPS)

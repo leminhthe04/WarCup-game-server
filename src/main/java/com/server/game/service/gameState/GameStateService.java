@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
+import com.server.game.model.entity.Minion;
 import com.server.game.model.entity.SlotState;
+import com.server.game.model.entity.building.Building;
 import com.server.game.model.entity.building.Tower;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.model.entity.context.CastSkillContext;
@@ -520,6 +522,14 @@ public class GameStateService {
             }
         }
         return res;
+    }
+
+    public Set<Minion> getAllMinions(GameState gameState) {
+        return gameState.getAllMinions();
+    }
+
+    public Set<Building> getAllBuildings(GameState gameState) {
+        return gameState.getAllBuildings();
     }
 
     public Set<SkillReceivable> getSkillReceivableEnemiesInScope(GameState gameState, Shape scope, SlotState slotState) {

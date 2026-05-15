@@ -405,6 +405,7 @@ public abstract class Entity implements Attackable {
 
     public abstract NPCPriorityEnum getNpcPriorityEnum();
 
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

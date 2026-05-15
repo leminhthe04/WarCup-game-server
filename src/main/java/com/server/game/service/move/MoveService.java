@@ -21,24 +21,26 @@ public class MoveService {
     /**
      * Đặt mục tiêu di chuyển mới cho người chơi
      */
-    public void setMove(MoveContext ctx, boolean needStopAttack) {
-        ctx.getMover().setMoveContext(ctx, false);
+    public boolean setMove(MoveContext ctx, boolean needStopAttack) {
+        boolean didSetMoving = ctx.getMover().setMoveContext(ctx, false);
         // log.info("Setting move target for entity {} to position {} at timestamp {}",
             // ctx.getMover().getStringId(), ctx.getTargetPoint(), ctx.getTimestamp());
 
-        if (needStopAttack) {
+        if (needStopAttack && didSetMoving) {
             attackService.setStopAttacking(ctx.getMover());
         }
+
+        return didSetMoving;
     }
 
-    public void setMove(Entity entity, Vector2 targetPoint, boolean needStopAttack) {
+    public boolean setMove(Entity entity, Vector2 targetPoint, boolean needStopAttack) {
         GameState gameState = entity.getGameState();
         MoveContext ctx = new MoveContext(gameState, entity, targetPoint, System.currentTimeMillis());
-        this.setMove(ctx, needStopAttack);
+        return this.setMove(ctx, needStopAttack);
     }
 
-    public void setStopMoving(Entity entity) {
-        entity.setMoveContext(null, true);
+    public boolean setStopMoving(Entity entity) {
+        return entity.setMoveContext(null, true);
     }
 
     /**

@@ -23,6 +23,7 @@ public class AttackContext { // only normal attacks, not skills
     @NotNull
     private long timestamp;
 
+    // used to check to get npc target prio
     private boolean didPerformAttack = false;
 
     @NotNull

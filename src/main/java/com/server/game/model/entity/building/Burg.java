@@ -1,6 +1,5 @@
 package com.server.game.model.entity.building;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +8,6 @@ import com.server.game.model.entity.Entity;
 import com.server.game.model.entity.GameState;
 import com.server.game.model.entity.SlotState;
 import com.server.game.model.entity.attackStrategy.BurgAttackStrategy;
-import com.server.game.model.entity.component.AttackComponent;
 import com.server.game.model.entity.context.AttackContext;
 import com.server.game.resource.modelInfo.SlotInfo.BurgDB;
 
@@ -18,13 +16,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
-
-@EqualsAndHashCode(callSuper=false)
+// @EqualsAndHashCode(callSuper = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 public final class Burg extends Building {
 
-    final AttackComponent attackComponent;
 
     public Burg(SlotState ownerSlot, GameState gameState, BurgDB burgDB) {
         super("burg_" + ownerSlot.getSlotNumber() + UUID.randomUUID().toString(),
@@ -32,53 +28,52 @@ public final class Burg extends Building {
         gameState.getGameMap().getBurgHP(), 
         gameState.getGameMap().getBurgDefense(), 
         burgDB.getId(), burgDB.getPosition(),
-        burgDB.getWidth(), burgDB.getLength(), burgDB.getRotate());
+        burgDB.getWidth(), burgDB.getLength(), burgDB.getRotate(),
+    
+        gameState.getGameMap().getBurgAttack(),
+        gameState.getGameMap().getBurgAttackSpeed(),
+        gameState.getGameMap().getBurgAttackRange(), 
+        new BurgAttackStrategy()
+    );
 
-        this.attackComponent = new AttackComponent(
-            this,
-            gameState.getGameMap().getBurgAttack(),
-            gameState.getGameMap().getBurgAttackSpeed(),
-            gameState.getGameMap().getBurgAttackRange(), 
-            new BurgAttackStrategy()
-        );
+
 
         this.addAllComponents();
     }
 
     @Override
     protected void addAllComponents() {
-        this.addComponent(AttackComponent.class, attackComponent);
     }
-    
+
     public boolean isAttacking() {
-        return attackComponent.getAttackContext() != null;
+        return this.getAttackContext() != null;
     }
 
     @Override
     public boolean receiveAttack(AttackContext ctx) {
         // Calculate the actual damage based on attacker's damage and burg's defense
         int actualDamage = (int) this.calculateActualDamage(ctx);
-        
+
         // Decrease the burg's health
         this.decreaseHP(actualDamage);
 
         // Add the actual damage to the context for other components to use
         ctx.addActualDamage(actualDamage);
-        
+
         // Send health update to clients
         ctx.getGameStateService().sendHealthUpdate(
-            ctx.getGameId(), this, actualDamage, ctx.getTimestamp());
+                ctx.getGameId(), this, actualDamage, ctx.getTimestamp());
 
         // Check if burg is destroyed
         if (!this.isAlive()) {
             handleDeath(ctx.getAttacker());
             return true; // Burg is destroyed
         }
-        
+
         return false; // Burg is still alive
     }
 
-    /** 
+    /**
      * Handle the case when the burg is destroyed
      */
     @Override
@@ -90,7 +85,7 @@ public final class Burg extends Building {
         List<String> removedEntityIds = new ArrayList<>();
         List<Entity> entitiesToRemove = new ArrayList<>();
 
-        for(Entity entity : gameState.getEntities()) {
+        for (Entity entity : gameState.getEntities()) {
             if (ownerSlot.equals(entity.getOwnerSlot())) {
                 removedEntityIds.add(entity.getStringId());
                 entitiesToRemove.add(entity);
@@ -98,12 +93,12 @@ public final class Burg extends Building {
         }
 
         this.getGameStateService().sendEntitiesRemoved(
-            this.getGameId(), removedEntityIds, 
-            killer.getAttackContext().getTimestamp());
-        
+                this.getGameId(), removedEntityIds,
+                killer.getAttackContext().getTimestamp());
+
         // ownerSlot.setEliminated(true);
 
-        for(Entity entity : entitiesToRemove) {
+        for (Entity entity : entitiesToRemove) {
             gameState.removeEntity(entity);
         }
 
@@ -113,11 +108,10 @@ public final class Burg extends Building {
 
         if (gameState.isGameOver()) {
             this.getGameStateService().sendGameOver(
-                this.getGameId(), 
-                gameState.getWinnerSlot().getSlotNumber(),
-                ownerSlot.getSlotNumber(), 
-                killer.getAttackContext().getTimestamp()
-            );
+                    this.getGameId(),
+                    gameState.getWinnerSlot().getSlotNumber(),
+                    ownerSlot.getSlotNumber(),
+                    killer.getAttackContext().getTimestamp());
         }
     }
 }
