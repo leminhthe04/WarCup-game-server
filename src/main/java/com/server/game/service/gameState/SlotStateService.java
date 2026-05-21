@@ -50,7 +50,7 @@ public class SlotStateService {
         }
 
         slotState.addMinion(minion);
-        log.info("Added minion {} to slot state {}", minion.getStringId(), slotState.getSlotNumber());
+        // log.info("Added minion {} to slot state {}", minion.getStringId(), slotState.getSlotNumber());
     }
 
     public boolean removeMinion(SlotState slotState, Minion minion) {
@@ -61,7 +61,7 @@ public class SlotStateService {
 
         boolean removed = slotState.getMinions().remove(minion);
         if (removed) {
-            log.info("Removed minion {} from slot state {}", minion.getStringId(), slotState.getSlotNumber());
+            // log.info("Removed minion {} from slot state {}", minion.getStringId(), slotState.getSlotNumber());
         } else {
             log.warn("Failed to remove minion {} from slot state {} - minion not found", minion.getStringId(),
                     slotState.getSlotNumber());

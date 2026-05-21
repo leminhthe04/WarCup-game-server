@@ -125,7 +125,7 @@ public class InitialPositionsSend implements TLVEncodable {
 
             this.burgData = new BurgData(gameState, slotState);
 
-            System.out.println(this);
+            log.info("{}", this);
         }
 
         

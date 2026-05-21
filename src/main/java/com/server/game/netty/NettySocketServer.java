@@ -28,7 +28,7 @@ public class NettySocketServer {
     public synchronized void start() throws Exception {
         
         if (serverChannel != null && serverChannel.isActive()) {
-            log.info("WebSocket server is already running.");
+            log.info("Socket server is already running.");
             return;
         }
 
@@ -50,12 +50,12 @@ public class NettySocketServer {
 
             this.serverChannel = f.channel();
 
-            log.info("WebSocket server started at port=" + port);
+            log.info("Socket server started at port=" + port);
 
 
             f.channel().closeFuture().sync();
         } catch (Exception e) {
-            log.error("Failed to start WebSocket server: " + e.getMessage());
+            log.error("Failed to start Socket server: " + e.getMessage());
             throw e;
         }
     }

@@ -53,6 +53,7 @@ public class MinionMessageHandler {
      */
     @MessageMapping(MinionSpawnReceive.class)
     public void handleMinionSpawnRequest(MinionSpawnReceive request, ChannelHandlerContext ctx) {
+
         Channel channel = ctx.channel();
         String gameId = ChannelManager.getGameIdByChannel(channel);
         Short requestingSlotNumber = ChannelManager.getSlotByChannel(channel);
@@ -90,6 +91,10 @@ public class MinionMessageHandler {
         }
 
         SlotState requestingSlot = gameStateService.getSlotStateFromSlotNumber(gameState, requestingSlotNumber);
+
+        log.info("Receive a [minion spawn] request in gameId={}, slot={}",
+            gameId, requestingSlotNumber);
+
 
         Minion newMinion = minionService.createMinion(requestingSlot, minionType);
 

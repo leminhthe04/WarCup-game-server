@@ -252,7 +252,7 @@ public class GameStateService {
         
         // Check if a respawn is already scheduled for this champion
         if (activeRespawnSchedulers.containsKey(respawnKey)) {
-            log.warn("Respawn already scheduled for gameId: {}, slot: {}, ignoring duplicate", gameId, slot);
+            // log.warn("Respawn already scheduled for gameId: {}, slot: {}, ignoring duplicate", gameId, slot);
             return;
         }
         

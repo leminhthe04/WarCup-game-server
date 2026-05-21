@@ -158,7 +158,7 @@ public final class Champion extends DependentEntity implements SkillReceivable {
 
     @Override
     protected void handleDeath(Entity killer) {
-        log.info("Champion {} is dead, handling death logic...", this.getName());
+        // log.info("Champion {} is dead, handling death logic...", this.getName());
 
         GameStateService gameStateService = this.getGameStateService();
 

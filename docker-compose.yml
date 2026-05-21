@@ -14,6 +14,8 @@ services:
       - TZ=Asia/Ho_Chi_Minh
     env_file:        # 
       - .env         # Báo cho Docker biết hãy nạp các biến từ file .env vào container
+    volumes:
+      - ./logs:/app/logs
 
   mongo:
     image: mongo:6.0

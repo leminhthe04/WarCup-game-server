@@ -80,7 +80,7 @@ public class AttackMessageHandler {
 
         attackService.setAttack(attackContext);
 
-        log.info("Receive a move request in gameId={}, slot={}: {}",
-            gameId, attacker.getOwnerSlot().getSlotNumber(), receiveObject);
+        log.info("Receive a [attack] request in gameId={}, slot={}",
+            gameId, attacker.getOwnerSlot().getSlotNumber());
     }
 }

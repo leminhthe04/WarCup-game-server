@@ -19,8 +19,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 @Data
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -56,7 +57,7 @@ public class ChampionInitialStatsSend implements TLVEncodable {
             })
             .collect(Collectors.toSet());
 
-        System.out.println(this);
+        log.info("{}", this);
     }
 
 

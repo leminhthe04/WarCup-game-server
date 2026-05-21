@@ -117,8 +117,8 @@ public class MinionService {
 
         moveService.setMove(minion, moveTo, true);
 
-        log.info("Minion follow standard road, move toward to opponent's side. MinionId: {}",
-                minion.getStringId());
+        // log.info("Minion follow standard road, move toward to opponent's side. MinionId: {}",
+        //         minion.getStringId());
     }
 
     /**
@@ -189,7 +189,7 @@ public class MinionService {
             return false; // Minion is still alive
         }
 
-        log.info("Minion {} has died in game {}", minionInstanceId, gameState.getGameId());
+        // log.info("Minion {} has died in game {}", minionInstanceId, gameState.getGameId());
 
         // Remove the minion from the game state
         this.removeMinion(gameState, minionInstanceId);
@@ -223,7 +223,7 @@ public class MinionService {
         }
 
         if (!deadMinions.isEmpty()) {
-            log.info("Processed {} minion deaths in game {}", deadMinions.size(), gameState.getGameId());
+            // log.info("Processed {} minion deaths in game {}", deadMinions.size(), gameState.getGameId());
         }
     }
 
@@ -235,7 +235,7 @@ public class MinionService {
         Channel channel = ChannelManager.getAnyChannelByGameId(gameId);
         if (channel != null) {
             channel.writeAndFlush(deathMessage);
-            log.info("Sent minion death message for gameId: {}, minionId: {}", gameId, minionInstanceId);
+            // log.info("Sent minion death message for gameId: {}, minionId: {}", gameId, minionInstanceId);
         } else {
             log.warn("No channel found for gameId: {} when sending minion death message", gameId);
         }
@@ -287,17 +287,17 @@ public class MinionService {
             }
         }
 
-        if (highestPrioEntity != null)
-            log.info("Highest prio entity id={}, prio={}", highestPrioEntity.getStringId(), highestPrioEntity.getNpcPriorityEnum());
+        // if (highestPrioEntity != null)
+        //     log.info("Highest prio entity id={}, prio={}", highestPrioEntity.getStringId(), highestPrioEntity.getNpcPriorityEnum());
 
         boolean needUpdatingAttackEnemy = highestPrioEntity != null &&
                 (!minion.isAttacking() || // is not attacking or is attacking but lower prio entity
                         highestPrioEntity.getNpcPriorityEnum().higher(
                                 minion.getCurrentAttackEntity().getNpcPriorityEnum()));
 
-        if (minion.isAttacking()) {
-            log.info("Current minion's target id={}, prio={}", minion.getCurrentAttackEntity().getStringId(), minion.getCurrentAttackEntity().getNpcPriorityEnum());
-        }
+        // if (minion.isAttacking()) {
+        //     log.info("Current minion's target id={}, prio={}", minion.getCurrentAttackEntity().getStringId(), minion.getCurrentAttackEntity().getNpcPriorityEnum());
+        // }
 
         if (!needUpdatingAttackEnemy) {
             return;
@@ -313,7 +313,7 @@ public class MinionService {
             minion.getCurrentPosition(), minion.getDetectionRange()));
 
 
-        log.info("Minion id={} detected entity id={} and is set to attack this entity", minion.getStringId(), highestPrioEntity.getStringId());
+        // log.info("Minion id={} detected entity id={} and is set to attack this entity", minion.getStringId(), highestPrioEntity.getStringId());
 
     }
 

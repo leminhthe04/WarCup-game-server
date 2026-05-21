@@ -31,7 +31,7 @@ public class AttackAnimationSend implements TLVEncodable {
         this.attackerId = ctx.getAttacker().getStringId();
         this.targetId = ctx.getTarget().getStringId();
         this.attackSpeed = ctx.getAttacker().getAttackSpeed();
-        this.timestamp = ctx.getTimestamp();
+        this.timestamp = System.currentTimeMillis();
     }
 
     @Override

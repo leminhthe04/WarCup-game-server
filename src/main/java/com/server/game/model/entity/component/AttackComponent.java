@@ -120,7 +120,7 @@ public class AttackComponent {
         ctx.setDidPerformAttack(didAttack);
 
         if (ctx.getTarget() == null || !ctx.getTarget().isAlive()) {
-            log.info("After performing attack, target is null or dead");
+            // log.info("After performing attack, target is null or dead");
             owner.getGameStateService().setStopMoving(this.owner, true);
             this.owner.getGameStateService().setStopAttacking(this.owner);
         }

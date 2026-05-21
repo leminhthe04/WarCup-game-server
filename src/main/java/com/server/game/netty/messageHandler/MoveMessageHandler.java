@@ -43,8 +43,8 @@ public class MoveMessageHandler {
             return;
         }
 
-        log.info("Receive a move request in gameId={}, slot={}: {}", 
-            gameId, mover.getOwnerSlot().getSlotNumber(), receiveObject);
+        log.info("Receive a [move] request in gameId={}, slot={}", 
+            gameId, mover.getOwnerSlot().getSlotNumber());
 
         
 
