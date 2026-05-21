@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @AllArgsConstructor
 public class MoveMessageHandler {
-    
+
     private final MoveContextFactory moveContextFactory;
 
     private final GameStateService gameStateService;
@@ -29,6 +29,7 @@ public class MoveMessageHandler {
     @MessageMapping(PositionReceive.class)
     public void handleMoveMessage(PositionReceive receiveObject, Channel channel) {
         
+
         String gameId = ChannelManager.getGameIdByChannel(channel);
         GameState gameState = gameStateService.getGameStateById(gameId);
         
@@ -37,7 +38,16 @@ public class MoveMessageHandler {
         //     minion.setDefensePosition(receiveObject.getPosition());
         //     minion.setInDefensiveStance(false);
         // }
+
+        if (mover == null) {
+            return;
+        }
+
+        log.info("Receive a move request in gameId={}, slot={}: {}", 
+            gameId, mover.getOwnerSlot().getSlotNumber(), receiveObject);
+
         
+
         MoveContext ctx = moveContextFactory.createMoveContext(
             gameState,
             mover,
@@ -47,5 +57,5 @@ public class MoveMessageHandler {
 
         moveService.setMove(ctx, true);
     }
-    
-} 
+
+}

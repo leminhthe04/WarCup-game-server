@@ -117,7 +117,7 @@ public class InitialPositionsSend implements TLVEncodable {
             this.rotate = gameState.getGameMap().getInitialRotate(this.slot);
             this.maxHP = champion.getMaxHP();
 
-            log.info("towersList of slotState ID={}: {}", slotState.getSlotNumber(), slotState.getTowers());
+            // log.info("towersList of slotState ID={}: {}", slotState.getSlotNumber(), slotState.getTowers());
 
             this.towerDataList = slotState.getTowers().stream()
                 .map(tower -> new TowerData(gameState, slotState, tower))

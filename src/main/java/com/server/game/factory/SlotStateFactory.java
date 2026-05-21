@@ -67,7 +67,7 @@ public class SlotStateFactory {
                     log.info(">>> [SlotStateFactory] Tower creation failed for slot " + slot);
                     return null;
                 }
-                log.info(">>> Tower ID={} created for slot ID={}", tower.getStringId(), slotState.getSlotNumber());
+                // log.info(">>> Tower ID={} created for slot ID={}", tower.getStringId(), slotState.getSlotNumber());
                 gameStateService.addEntityTo(gameState, tower);
                 return tower;
             })

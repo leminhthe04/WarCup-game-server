@@ -45,7 +45,7 @@ public class AttackMessageHandler {
         Long lastUpdate = lastUpdateTime.get(playerKey);
 
         if (lastUpdate != null && (currentTime - lastUpdate) < MIN_UPDATE_INTERVAL) {
-            log.debug("Rate limit exceeded for player: {} - ignore attack position update", playerKey);
+            log.info("Rate limit exceeded for player: {} - ignore attack position update", playerKey);
             return;
         }
 
@@ -80,6 +80,7 @@ public class AttackMessageHandler {
 
         attackService.setAttack(attackContext);
 
-        log.info("Attack context set for entity: {}", attackerStringId);
+        log.info("Receive a move request in gameId={}, slot={}: {}",
+            gameId, attacker.getOwnerSlot().getSlotNumber(), receiveObject);
     }
 }

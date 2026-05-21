@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import com.server.game.factory.GameStateFactory;
 import com.server.game.model.entity.Champion;
 import com.server.game.model.entity.GameState;
-import com.server.game.model.entity.SlotState;
 import com.server.game.netty.ChannelManager;
 import com.server.game.netty.sendObject.initialGameState.ChampionInitialStatsSend;
 import com.server.game.netty.sendObject.initialGameState.InitialPositionsSend;
@@ -36,9 +35,9 @@ public class GameInititalLoadingMessageHandler {
         GameState gameState = gameStateFactory.createGameState(channel);
 
         log.info("gameState Id={}: {}", gameState.getGameId(), gameState);
-        for (SlotState slotState : gameState.getSlotStates().values()) {
-            log.info("Towerlist of slot ID={}: {}", slotState.getSlotNumber(), slotState.getTowers());
-        }
+        // for (SlotState slotState : gameState.getSlotStates().values()) {
+            // log.info("Towerlist of slot ID={}: {}", slotState.getSlotNumber(), slotState.getTowers());
+        // }
 
         // broadcast initial positions
         ChannelFuture future = 
