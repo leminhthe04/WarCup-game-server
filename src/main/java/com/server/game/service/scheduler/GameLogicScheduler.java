@@ -42,9 +42,9 @@ public class GameLogicScheduler {
      */
     @Scheduled(fixedDelayString = "${game.tick-interval-ms}") // 33ms ~ 30 FPS for responsive gameplay
     public void gameLogicLoop() {
-        for (GameState gameState : gameStateService.getAllActiveGameStates()) {
-            try {
 
+        gameStateService.getAllActiveGameStates().parallelStream().forEach(gameState -> {
+            try {
                 // Update game tick
                 gameStateService.incrementTick(gameState);
 
@@ -66,11 +66,40 @@ public class GameLogicScheduler {
                 minionService.updateDetections(gameState);
 
                 buildingService.updateDetections(gameState);
-
             } catch (Exception e) {
-                log.error("Error in game logic loop for game: {}", gameState.getGameId(), e);
+                log.error("Error in game: {}", gameState.getGameId(), e);
             }
-        }
+        });
+
+        // for (GameState gameState : gameStateService.getAllActiveGameStates()) {
+        // try {
+
+        // // Update game tick
+        // gameStateService.incrementTick(gameState);
+
+        // // Process attack targeting and continuous combat
+        // attackService.processAttacks(gameState);
+
+        // // Check for minion deaths and handle cleanup
+        // minionService.checkAndHandleAllMinionDeaths(gameState);
+
+        // // Update movement positions
+        // moveService.updatePositions(gameState);
+
+        // castSkillService.updateDurationSkills(gameState);
+
+        // goldService.randomlyGenerateGoldMine(gameState);
+
+        // minionService.checkStopChasing(gameState);
+
+        // minionService.updateDetections(gameState);
+
+        // buildingService.updateDetections(gameState);
+
+        // } catch (Exception e) {
+        // log.error("Error in game logic loop for game: {}", gameState.getGameId(), e);
+        // }
+        // }
     }
 
     /**
@@ -79,14 +108,26 @@ public class GameLogicScheduler {
      */
     @Scheduled(fixedDelay = 1000) // 1000ms = 1 FPS for gold generation
     public void goldGenerationLoop() {
-        for (GameState gameState : gameStateService.getAllActiveGameStates()) {
+
+        gameStateService.getAllActiveGameStates().parallelStream().forEach(gameState -> {
             try {
+
                 goldService.autoIncreaseGold(gameState);
 
             } catch (Exception e) {
-                // log.error("Error in game logic loop for game: {}", gameState.getGameId(), e);
+                log.error("Error in game: {}", gameState.getGameId(), e);
             }
-        }
+        });
+
+        // for (GameState gameState : gameStateService.getAllActiveGameStates()) {
+        // try {
+        // goldService.autoIncreaseGold(gameState);
+
+        // } catch (Exception e) {
+        // log.error("Error in game logic goldGenerationLoop: {}",
+        // gameState.getGameId(), e);
+        // }
+        // }
     }
 
     /**
@@ -95,66 +136,70 @@ public class GameLogicScheduler {
      */
     // @Scheduled(fixedDelay = 200) // 200ms = 5 FPS for non-critical systems
     // public void slowGameLogicLoop() {
-    //     for (GameState gameState : gameStateService.getAllActiveGameStates()) {
-    //         try {
-    //             // defensiveStanceService.updateDefensiveStances(gameState);
-    //             // defenseService.updateDefenses(gameState);
-    //             // NOTE: Add slower update systems here
-    //             // - Resource generation
-    //             // - AI decision making
-    //             // - Game statistics updates
-    //             // - Health regeneration
-    //             // - Status effect updates
+    // for (GameState gameState : gameStateService.getAllActiveGameStates()) {
+    // try {
+    // // defensiveStanceService.updateDefensiveStances(gameState);
+    // // defenseService.updateDefenses(gameState);
+    // // NOTE: Add slower update systems here
+    // // - Resource generation
+    // // - AI decision making
+    // // - Game statistics updates
+    // // - Health regeneration
+    // // - Status effect updates
 
-    //         } catch (Throwable t) {
-    //             log.error("Error in slow game logic loop", t);
-    //         }
-    //     }
+    // } catch (Throwable t) {
+    // log.error("Error in slow game logic loop", t);
+    // }
+    // }
     // }
 
     /**
      * Very slow game logic loop - runs every 1000ms (1 FPS)
      * Handles background game systems
      */
-    @Scheduled(fixedDelay = 1000) // 1000ms = 1 FPS for background systems
-    public void backgroundGameLogicLoop() {
-        for (GameState gameState : gameStateService.getAllActiveGameStates()) {
-            try {
-                // NOTE: Add background systems here
-                // - Game session cleanup
-                // - Performance metrics collection
-                // - Anti-cheat validation
-                // - Database persistence
+    // @Scheduled(fixedDelay = 1000) // 1000ms = 1 FPS for background systems
+    // public void backgroundGameLogicLoop() {
+    // for (GameState gameState : gameStateService.getAllActiveGameStates()) {
+    // try {
+    // // NOTE: Add background systems here
+    // // - Game session cleanup
+    // // - Performance metrics collection
+    // // - Anti-cheat validation
+    // // - Database persistence
 
-            } catch (Exception e) {
-                log.error("Error in background game logic loop for game: {}", gameState.getGameId(), e);
-            }
-        }
-    }
+    // } catch (Exception e) {
+    // log.error("Error in background game logic loop for game: {}",
+    // gameState.getGameId(), e);
+    // }
+    // }
+    // }
 
     /**
      * Heartbeat method to keep the game logic scheduler alive
      * 
      * @return
      */
-    @Scheduled(fixedDelay = 30000) // 30 seconds
-    public void sendHeartbeats() {
-        for (Map.Entry<String, Channel> entry : ChannelManager.getAllUserChannels().entrySet()) {
-            String userId = entry.getKey();
-            Channel channel = entry.getValue();
+    // @Scheduled(fixedDelay = 30000) // 30 seconds
+    // public void sendHeartbeats() {
+    // for (Map.Entry<String, Channel> entry :
+    // ChannelManager.getAllUserChannels().entrySet()) {
+    // String userId = entry.getKey();
+    // Channel channel = entry.getValue();
 
-            if (channel.isActive()) {
-                channel.writeAndFlush(new HeartbeatMessage())
-                        .addListener(future -> {
-                            if (!future.isSuccess()) {
-                                log.info(">>> Heartbeat failed for user " + userId + ". Cleaning up channel.");
-                                ChannelManager.unregister(channel);
-                            }
-                        });
-            } else {
-                log.info(">>> Inactive channel for user " + userId + ". Removing from manager.");
-                ChannelManager.unregister(channel);
-            }
-        }
-    }
+    // if (channel.isActive()) {
+    // channel.writeAndFlush(new HeartbeatMessage())
+    // .addListener(future -> {
+    // if (!future.isSuccess()) {
+    // log.info(">>> Heartbeat failed for user " + userId + ". Cleaning up
+    // channel.");
+    // ChannelManager.unregister(channel);
+    // }
+    // });
+    // } else {
+    // log.info(">>> Inactive channel for user " + userId + ". Removing from
+    // manager.");
+    // ChannelManager.unregister(channel);
+    // }
+    // }
+    // }
 }

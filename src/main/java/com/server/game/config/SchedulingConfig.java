@@ -14,13 +14,13 @@ public class SchedulingConfig {
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(10);
+        scheduler.setPoolSize(2);
         scheduler.setThreadNamePrefix("scheduled-task-");
         scheduler.setWaitForTasksToCompleteOnShutdown(true);
         scheduler.setAwaitTerminationSeconds(10);
         scheduler.setErrorHandler(t -> {
             log.error("Error in scheduled task: " + t.getMessage());
-            t.printStackTrace();
+            // t.printStackTrace();
         });
         return scheduler;
     }
