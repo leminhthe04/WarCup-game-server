@@ -1,12 +1,12 @@
 # WarCup Game Server
 
-A high-performance multiplayer online game server built with Spring Boot 3.4.6 and Java 17. This server provides WebSocket-based real-time communication with MongoDB persistence and Redis caching.
+A high-performance multiplayer online game server built with Spring Boot 3.4.6 and Java 17. This server provides TCP-based real-time communication with MongoDB persistence and Redis caching.
 
 ## 📋 Overview
 
 WarCup Game Server is a robust backend solution for multiplayer gaming applications. It features:
 
-- **Real-time Communication**: WebSocket support for instant player interactions
+- **Real-time Communication**: TCP support for instant player interactions
 - **Scalable Architecture**: Built with Spring Boot and Netty
 - **Data Persistence**: MongoDB for reliable data storage
 - **High Performance**: Redis caching for optimized response times
